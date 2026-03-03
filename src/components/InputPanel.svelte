@@ -88,7 +88,7 @@
           inputmode="numeric"
           value={formatSEK(totalLonesumma)}
           onfocus={handleFocus}
-          onblur={(e) => handleBlur(e, 0, 15000000, (v) => totalLonesumma = v, formatSEK)}
+          onblur={(e) => handleBlur(e, 0, Infinity, (v) => totalLonesumma = v, formatSEK)}
           onkeydown={handleKeydown}
         />
       </div>
@@ -99,7 +99,8 @@
       min="0"
       max="15000000"
       step="50000"
-      bind:value={totalLonesumma}
+      value={Math.min(totalLonesumma, 15000000)}
+      oninput={(e) => totalLonesumma = Number(e.target.value)}
     />
     <div class="range-labels">
       <span>0 kr</span>
@@ -127,7 +128,7 @@
           inputmode="numeric"
           value={formatSEK(omkostnadsbeloppDirekt)}
           onfocus={handleFocus}
-          onblur={(e) => handleBlur(e, 0, 5000000, (v) => omkostnadsbeloppDirekt = v, formatSEK)}
+          onblur={(e) => handleBlur(e, 0, Infinity, (v) => omkostnadsbeloppDirekt = v, formatSEK)}
           onkeydown={handleKeydown}
         />
       </div>
@@ -138,7 +139,8 @@
       min="0"
       max="5000000"
       step="25000"
-      bind:value={omkostnadsbeloppDirekt}
+      value={Math.min(omkostnadsbeloppDirekt, 5000000)}
+      oninput={(e) => omkostnadsbeloppDirekt = Number(e.target.value)}
     />
     <div class="range-labels">
       <span>0 kr</span>
@@ -158,7 +160,7 @@
           inputmode="numeric"
           value={formatSEK(omkostnadsbeloppHolding)}
           onfocus={handleFocus}
-          onblur={(e) => handleBlur(e, 0, 5000000, (v) => omkostnadsbeloppHolding = v, formatSEK)}
+          onblur={(e) => handleBlur(e, 0, Infinity, (v) => omkostnadsbeloppHolding = v, formatSEK)}
           onkeydown={handleKeydown}
         />
       </div>
@@ -169,7 +171,8 @@
       min="0"
       max="5000000"
       step="25000"
-      bind:value={omkostnadsbeloppHolding}
+      value={Math.min(omkostnadsbeloppHolding, 5000000)}
+      oninput={(e) => omkostnadsbeloppHolding = Number(e.target.value)}
     />
     <div class="range-labels">
       <span>0 kr</span>
