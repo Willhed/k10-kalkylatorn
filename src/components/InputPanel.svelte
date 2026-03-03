@@ -67,7 +67,7 @@
       type="range"
       min="1"
       max="100"
-      step="0.01"
+      step="0.05"
       bind:value={agarandel}
     />
     <div class="range-labels">
