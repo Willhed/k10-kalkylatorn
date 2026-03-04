@@ -12,6 +12,9 @@
   let totalLonesumma = $state(2_000_000);
   let omkostnadsbeloppDirekt = $state(100_000);
   let omkostnadsbeloppHolding = $state(100_000);
+  // Övriga fåmansbolag: array av ägarandelar i procent (t.ex. [100, 50])
+  let ovrigaBolag = $state([]);
+  let ovrigaAgarandelar = $derived(ovrigaBolag.map(a => a / 100));
 
   // Beräkna minsta lön för att undvika 50×-taket
   // 50×-tak: lönebaseratCap = 50 × egenLon ≥ lönebaseratRaw
@@ -24,7 +27,7 @@
   );
 
   let direktResult = $derived(
-    beraknaGransbelopp(agarandel / 100, totalLonesumma, egenLon, omkostnadsbeloppDirekt)
+    beraknaGransbelopp(agarandel / 100, totalLonesumma, egenLon, omkostnadsbeloppDirekt, IBB, ovrigaAgarandelar)
   );
 
   // Holdingbolag: du äger 100% av holding, holding äger samma andel av opco
@@ -36,7 +39,7 @@
     agarandel > 50 ? egenLon : 0
   );
   let holdingResult = $derived(
-    beraknaGransbelopp(1.0, holdingLonesumma, holdingEgenLon, omkostnadsbeloppHolding)
+    beraknaGransbelopp(1.0, holdingLonesumma, holdingEgenLon, omkostnadsbeloppHolding, IBB, ovrigaAgarandelar)
   );
 </script>
 
@@ -50,6 +53,7 @@
       {egenLon}
       bind:omkostnadsbeloppDirekt
       bind:omkostnadsbeloppHolding
+      bind:ovrigaBolag
     />
   </div>
 

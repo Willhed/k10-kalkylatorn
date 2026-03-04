@@ -18,11 +18,24 @@ import {
  * @param {number} egenLon - Ägarens egen lön (kr)
  * @param {number} omkostnadsbelopp - Anskaffningsvärde för aktierna (kr)
  * @param {number} ibb - Inkomstbasbelopp (default IBB)
+ * @param {number[]} ovrigaAgarandelar - Ägarandelar 0-1 i övriga fåmansbolag (påverkar grundbeloppets proportionering)
  * @returns {object} Objekt med alla beräkningskomponenter
  */
-export function beraknaGransbelopp(agarandel, totalLonesumma, egenLon, omkostnadsbelopp = 0, ibb = IBB) {
-  // 1. Grundbelopp = ägarandel × 4 × IBB
-  const grundbelopp = agarandel * GRUNDBELOPP_FACTOR * ibb;
+export function beraknaGransbelopp(agarandel, totalLonesumma, egenLon, omkostnadsbelopp = 0, ibb = IBB, ovrigaAgarandelar = []) {
+  // 1. Grundbelopp med eventuell proportionering (max 4 IBB totalt över alla bolag)
+  const fullGrundbelopp = GRUNDBELOPP_FACTOR * ibb; // 4 × IBB = taket
+  const rawGrundbelopp = agarandel * fullGrundbelopp;
+  const totalRawGrundbelopp = rawGrundbelopp + ovrigaAgarandelar.reduce((sum, a) => sum + a * fullGrundbelopp, 0);
+  const grundbeloppProportioneras = totalRawGrundbelopp > fullGrundbelopp;
+
+  let grundbelopp;
+  if (grundbeloppProportioneras) {
+    // Proportionera: varje bolag får sin andel av 4 IBB baserat på ägarandel
+    const sumAgarandelar = agarandel + ovrigaAgarandelar.reduce((sum, a) => sum + a, 0);
+    grundbelopp = (agarandel / sumAgarandelar) * fullGrundbelopp;
+  } else {
+    grundbelopp = rawGrundbelopp;
+  }
 
   // 2. Lönebaserat utrymme
   const loneunderlag = agarandel * totalLonesumma;
@@ -44,6 +57,8 @@ export function beraknaGransbelopp(agarandel, totalLonesumma, egenLon, omkostnad
   return {
     agarandel,
     grundbelopp,
+    rawGrundbelopp,
+    grundbeloppProportioneras,
     loneunderlag,
     loneavdrag,
     lonebaseratRaw,

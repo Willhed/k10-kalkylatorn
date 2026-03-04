@@ -7,6 +7,7 @@
     egenLon,
     omkostnadsbeloppDirekt = $bindable(),
     omkostnadsbeloppHolding = $bindable(),
+    ovrigaBolag = $bindable(),
   } = $props();
 
   function clamp(val, min, max) {
@@ -148,6 +149,40 @@
       <span>5 Mkr</span>
     </div>
     <p class="input-help">Anskaffningsv&auml;rde f&ouml;r aktier i operativbolaget</p>
+  </div>
+
+  <div class="input-group ovriga-group">
+    <div class="input-header">
+      <label>&#214;vriga f&#229;mansbolag du &#228;ger</label>
+    </div>
+    <p class="input-help">
+      Grundbeloppet (4 &times; IBB) &#228;r gemensamt f&#246;r alla dina f&#229;mansbolag.
+      &#196;ger du andelar i fler bolag s&#229; proportioneras det.
+    </p>
+    {#each ovrigaBolag as _, i}
+      <div class="ovriga-row">
+        <span class="ovriga-label">Bolag {i + 1}</span>
+        <div class="input-value-wrapper">
+          <input
+            class="input-number"
+            type="text"
+            inputmode="numeric"
+            value={formatPercent(ovrigaBolag[i])}
+            onfocus={handleFocus}
+            onblur={(e) => {
+              const val = parseNumber(e.target.value);
+              if (!isNaN(val)) {
+                ovrigaBolag[i] = clamp(roundTo(val, 2), 1, 100);
+                e.target.value = formatPercent(ovrigaBolag[i]);
+              }
+            }}
+            onkeydown={handleKeydown}
+          />
+        </div>
+        <button class="remove-btn" onclick={() => ovrigaBolag.splice(i, 1)} aria-label="Ta bort bolag {i + 1}">&times;</button>
+      </div>
+    {/each}
+    <button class="add-btn" onclick={() => ovrigaBolag.push(100)}>+ L&#228;gg till bolag</button>
   </div>
 
   <div class="input-group">
@@ -306,5 +341,63 @@
     font-size: 1.05rem;
     color: var(--color-primary);
     font-variant-numeric: tabular-nums;
+  }
+
+  .ovriga-group {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .ovriga-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+  }
+
+  .ovriga-label {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .remove-btn {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 2px 7px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .remove-btn:hover {
+    color: var(--color-danger);
+    border-color: var(--color-danger);
+  }
+
+  .add-btn {
+    display: block;
+    width: 100%;
+    margin-top: var(--spacing-sm);
+    background: none;
+    border: 1px dashed var(--color-border);
+    border-radius: 6px;
+    color: var(--color-primary);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-align: center;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .add-btn:hover {
+    background: var(--color-surface);
+    border-color: var(--color-primary);
   }
 </style>
