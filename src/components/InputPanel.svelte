@@ -8,6 +8,7 @@
     omkostnadsbeloppDirekt = $bindable(),
     omkostnadsbeloppHolding = $bindable(),
     ovrigaBolag = $bindable(),
+    dotterbolagOverride = $bindable(),
   } = $props();
 
   function clamp(val, min, max) {
@@ -77,6 +78,16 @@
       <span>100 %</span>
     </div>
     <p class="input-help">Direkt: din andel. Holding: holdingbolagets andel (&ouml;ver 50 % ger l&ouml;neunderlag)</p>
+    {#if agarandel <= 50}
+      <label class="checkbox-row">
+        <input type="checkbox" bind:checked={dotterbolagOverride} />
+        <span>Best&auml;mmande inflytande (dotterbolag enligt &Aring;RL 1:4)</span>
+      </label>
+      <p class="input-help">
+        Kryssa i om holdingbolaget har best&auml;mmande inflytande via t.ex.
+        r&ouml;stmajoritet, styrelsemajoritet eller avtal &mdash; trots kapitalandel under 50 %.
+      </p>
+    {/if}
   </div>
 
   <div class="input-group">
@@ -399,5 +410,22 @@
   .add-btn:hover {
     background: var(--color-surface);
     border-color: var(--color-primary);
+  }
+
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    font-size: 0.85rem;
+    font-weight: 400;
+    cursor: pointer;
+  }
+
+  .checkbox-row input[type="checkbox"] {
+    accent-color: var(--color-primary);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
   }
 </style>
