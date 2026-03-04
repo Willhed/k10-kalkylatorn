@@ -24,10 +24,26 @@
         <tr>
           <td>
             Grundbelopp
-            <span class="formula">&auml;garandel &times; 4 &times; IBB</span>
+            <span class="formula">
+              {#if direktResult.grundbeloppProportioneras || holdingResult.grundbeloppProportioneras}
+                proportionerat ur 4 &times; IBB (max totalt)
+              {:else}
+                &auml;garandel &times; 4 &times; IBB
+              {/if}
+            </span>
           </td>
-          <td class="val">{formatSEK(direktResult.grundbelopp)}</td>
-          <td class="val">{formatSEK(holdingResult.grundbelopp)}</td>
+          <td class="val">
+            {formatSEK(direktResult.grundbelopp)}
+            {#if direktResult.grundbeloppProportioneras}
+              <span class="prop-badge" title="Reducerat fr&aring;n {formatSEK(direktResult.rawGrundbelopp)} p.g.a. proportionering">Prop.</span>
+            {/if}
+          </td>
+          <td class="val">
+            {formatSEK(holdingResult.grundbelopp)}
+            {#if holdingResult.grundbeloppProportioneras}
+              <span class="prop-badge" title="Reducerat fr&aring;n {formatSEK(holdingResult.rawGrundbelopp)} p.g.a. proportionering">Prop.</span>
+            {/if}
+          </td>
         </tr>
         <tr>
           <td>
@@ -117,6 +133,15 @@
     Holdingbolaget &auml;gs till 100 % av dig. Om andelen i operativbolaget &auml;r &ouml;ver 50 %
     r&auml;knas l&ouml;ner fr&aring;n dotterbolaget in i K10-ber&auml;kningen.
   </p>
+  {#if direktResult.grundbeloppProportioneras || holdingResult.grundbeloppProportioneras}
+    <div class="prop-notice">
+      <strong>Grundbelopp proportionerat:</strong> Du &auml;ger andelar i fler bolag &auml;n ett,
+      varf&ouml;r grundbeloppet (max 4 &times; IBB totalt) f&ouml;rdelas proportionellt baserat p&aring;
+      dina &auml;garandelar. Utan begr&auml;nsning hade grundbeloppet i detta scenario blivit
+      {formatSEK(direktResult.rawGrundbelopp)} (direkt) resp.
+      {formatSEK(holdingResult.rawGrundbelopp)} (holding).
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -225,5 +250,27 @@
     font-size: 0.8rem;
     color: var(--color-text-muted);
     font-style: italic;
+  }
+
+  .prop-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 0 5px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 4px;
+    cursor: help;
+  }
+
+  .prop-notice {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: #1e40af;
   }
 </style>
