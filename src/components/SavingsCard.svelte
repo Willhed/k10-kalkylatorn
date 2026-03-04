@@ -36,6 +36,10 @@
         </span>
       </div>
     </div>
+    <p class="approx-note">
+      * Skattebesparingen &auml;r uppskattad med en schablonm&auml;ssig progressiv skatt p&aring; {formatPercentDecimal(PROGRESSIV_SKATT_APPROX)}.
+      Din faktiska marginalskatt beror p&aring; din totala inkomst och din kommuns skattesats.
+    </p>
   </div>
 {:else}
   <div class="card savings-card direkt-wins">
@@ -53,6 +57,10 @@
         <span class="savings-amount highlight">~{formatSEK(taxSavings)}</span>
       </div>
     </div>
+    <p class="approx-note">
+      * Skattebesparingen &auml;r uppskattad med en schablonm&auml;ssig progressiv skatt p&aring; {formatPercentDecimal(PROGRESSIV_SKATT_APPROX)}.
+      Din faktiska marginalskatt beror p&aring; din totala inkomst och din kommuns skattesats.
+    </p>
   </div>
 {/if}
 
@@ -128,6 +136,13 @@
     font-size: 0.75rem;
     color: var(--color-text-muted);
     margin-top: var(--spacing-xs);
+  }
+
+  .approx-note {
+    margin-top: var(--spacing-md);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-style: italic;
   }
 
   .equal-text {
