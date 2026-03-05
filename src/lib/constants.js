@@ -2,7 +2,7 @@
 // K10 använder föregående års IBB; SLR är 30 nov föregående år.
 export const IBB_TABELL = {
   2026: { ibb: 80_600, slr: 0.0255 },                       // IBB 2025, SLR 30 nov 2025
-  2027: { ibb: 83_400, slr: 0.0255, preliminary: true },    // IBB 2026, SLR 30 nov 2026 (okänd – använder 2025 tills vidare)
+  2027: { ibb: 83_400, slr: 0.0255 },                        // IBB 2026, SLR 30 nov 2026
 };
 export const UTDELNINGSAR_DEFAULT = 2026;
 
