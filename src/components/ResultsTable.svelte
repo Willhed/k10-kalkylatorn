@@ -1,7 +1,8 @@
 <script>
   import { formatSEK, formatPercent, formatPercentDecimal } from '../lib/formatters.js';
+  import { IBB, RANTA_PROCENT } from '../lib/constants.js';
 
-  let { direktResult, holdingResult, ibb, rantaProcent } = $props();
+  let { direktResult, holdingResult } = $props();
 
   let savings = $derived(holdingResult.gransbelopp - direktResult.gransbelopp);
   let direktWins = $derived(direktResult.gransbelopp > holdingResult.gransbelopp);
@@ -59,7 +60,7 @@
         <tr>
           <td>
             L&ouml;neavdrag
-            <span class="formula">8 &times; IBB = {formatSEK(8 * ibb)}</span>
+            <span class="formula">8 &times; IBB = {formatSEK(8 * IBB)}</span>
           </td>
           <td class="val negative">&minus;{formatSEK(direktResult.loneavdrag)}</td>
           {#if holdingResult.loneunderlag > 0}
@@ -103,7 +104,7 @@
         <tr>
           <td>
             R&auml;nta p&aring; omkostnadsbelopp
-            <span class="formula">(belopp &minus; 100 000) &times; {formatPercentDecimal(rantaProcent)}</span>
+            <span class="formula">(belopp &minus; 100 000) &times; {formatPercentDecimal(RANTA_PROCENT)}</span>
           </td>
           <td class="val">{formatSEK(direktResult.rantaUtrymme)}</td>
           <td class="val">{formatSEK(holdingResult.rantaUtrymme)}</td>

@@ -1,6 +1,5 @@
 <script>
   import { formatSEK, formatPercent } from '../lib/formatters.js';
-  import { IBB_TABELL } from '../lib/constants.js';
 
   let {
     agarandel = $bindable(),
@@ -10,10 +9,7 @@
     omkostnadsbeloppHolding = $bindable(),
     ovrigaBolag = $bindable(),
     dotterbolagOverride = $bindable(),
-    utdelningsar = $bindable(),
   } = $props();
-
-  const tillgangligaAr = Object.keys(IBB_TABELL).map(Number).sort((a, b) => a - b);
 
   function clamp(val, min, max) {
     return Math.min(max, Math.max(min, val));
@@ -52,25 +48,6 @@
 
 <div class="card input-panel">
   <h2>Parametrar</h2>
-
-  <div class="input-group year-group">
-    <div class="input-header">
-      <label for="utdelningsar">Utdelnings&aring;r</label>
-      <select id="utdelningsar" class="year-select" bind:value={utdelningsar}>
-        {#each tillgangligaAr as ar}
-          <option value={ar}>{ar}</option>
-        {/each}
-      </select>
-    </div>
-    <p class="input-help">
-      IBB {IBB_TABELL[utdelningsar].ibb.toLocaleString('sv-SE')} kr &middot; SLR {(IBB_TABELL[utdelningsar].slr * 100).toFixed(2).replace('.', ',')}%
-    </p>
-    {#if IBB_TABELL[utdelningsar].preliminary}
-      <p class="preliminary-warning">
-        &#9888;&#65039; IBB {utdelningsar} och SLR 30 nov {utdelningsar - 1} &auml;r inte fastst&auml;llda &auml;nnu. V&auml;rdena &auml;r prelimin&auml;ra uppskattningar &mdash; uppdatera constants.js n&auml;r officiella siffror publiceras.
-      </p>
-    {/if}
-  </div>
 
   <div class="input-group">
     <div class="input-header">
@@ -388,44 +365,6 @@
     border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: var(--spacing-sm) var(--spacing-md);
-  }
-
-  .year-group {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    padding: var(--spacing-sm) var(--spacing-md);
-  }
-
-  .year-select {
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    background: transparent;
-    border: 1.5px solid transparent;
-    border-radius: 6px;
-    padding: 2px 8px;
-    cursor: pointer;
-    transition: border-color 0.15s ease;
-  }
-
-  .year-select:hover,
-  .year-select:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    background: var(--color-surface);
-  }
-
-  .preliminary-warning {
-    margin-top: var(--spacing-xs);
-    font-size: 0.78rem;
-    color: #92400e;
-    background: #fef3c7;
-    border: 1px solid #fcd34d;
-    border-radius: 6px;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-style: normal;
   }
 
   .ovriga-row {

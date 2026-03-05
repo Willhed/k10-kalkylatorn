@@ -20,10 +20,9 @@ import {
  * @param {number} omkostnadsbelopp - Anskaffningsvärde för aktierna (kr)
  * @param {number} ibb - Inkomstbasbelopp (default IBB)
  * @param {number[]} ovrigaAgarandelar - Ägarandelar 0-1 i övriga fåmansbolag (påverkar grundbeloppets proportionering)
- * @param {number} rantaProcent - Räntesats för omkostnadsbelopp (SLR + 9%), default RANTA_PROCENT
  * @returns {object} Objekt med alla beräkningskomponenter
  */
-export function beraknaGransbelopp(agarandel, totalLonesumma, egenLon, omkostnadsbelopp = 0, ibb = IBB, ovrigaAgarandelar = [], rantaProcent = RANTA_PROCENT) {
+export function beraknaGransbelopp(agarandel, totalLonesumma, egenLon, omkostnadsbelopp = 0, ibb = IBB, ovrigaAgarandelar = []) {
   // 1. Grundbelopp med eventuell proportionering (max 4 IBB totalt över alla bolag)
   const fullGrundbelopp = GRUNDBELOPP_FACTOR * ibb; // 4 × IBB = taket
   const rawGrundbelopp = agarandel * fullGrundbelopp;
@@ -51,7 +50,7 @@ export function beraknaGransbelopp(agarandel, totalLonesumma, egenLon, omkostnad
 
   // 4. Ränta på omkostnadsbelopp: (belopp - 100 000) × (SLR + 9%)
   const rantaBas = Math.max(0, omkostnadsbelopp - OMKOSTNAD_TRÖSKEL);
-  const rantaUtrymme = rantaBas * rantaProcent;
+  const rantaUtrymme = rantaBas * RANTA_PROCENT;
 
   // 5. Gränsbelopp = grundbelopp + lönebaserat utrymme + ränta
   const gransbelopp = grundbelopp + lonebaseratUtrymme + rantaUtrymme;
