@@ -12,9 +12,9 @@
   let totalLonesumma = $state(2_000_000);
   let omkostnadsbeloppDirekt = $state(100_000);
   let omkostnadsbeloppHolding = $state(100_000);
-  // Övriga fåmansbolag: array av ägarandelar i procent (t.ex. [100, 50])
+  // Övriga fåmansbolag: array av { namn: string, andel: number (procent) }
   let ovrigaBolag = $state([]);
-  let ovrigaAgarandelar = $derived(ovrigaBolag.map(a => a / 100));
+  let ovrigaAgarandelar = $derived(ovrigaBolag.map(b => b.andel / 100));
   // Override: bestämmande inflytande utan kapitalandel >50%
   let dotterbolagOverride = $state(false);
   let arDotterbolag = $derived(agarandel > 50 || dotterbolagOverride);

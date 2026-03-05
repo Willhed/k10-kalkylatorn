@@ -170,30 +170,36 @@
       Grundbeloppet (4 &times; IBB) &#228;r gemensamt f&#246;r alla dina f&#229;mansbolag.
       &#196;ger du andelar i fler bolag s&#229; proportioneras det.
     </p>
-    {#each ovrigaBolag as _, i}
+    {#each ovrigaBolag as bolag, i}
       <div class="ovriga-row">
-        <span class="ovriga-label">Bolag {i + 1}</span>
+        <input
+          class="ovriga-namn"
+          type="text"
+          placeholder="Bolag {i + 1}"
+          bind:value={ovrigaBolag[i].namn}
+          onkeydown={handleKeydown}
+        />
         <div class="input-value-wrapper">
           <input
             class="input-number"
             type="text"
             inputmode="numeric"
-            value={formatPercent(ovrigaBolag[i])}
+            value={formatPercent(bolag.andel)}
             onfocus={handleFocus}
             onblur={(e) => {
               const val = parseNumber(e.target.value);
               if (!isNaN(val)) {
-                ovrigaBolag[i] = clamp(roundTo(val, 2), 1, 100);
-                e.target.value = formatPercent(ovrigaBolag[i]);
+                ovrigaBolag[i].andel = clamp(roundTo(val, 2), 1, 100);
+                e.target.value = formatPercent(ovrigaBolag[i].andel);
               }
             }}
             onkeydown={handleKeydown}
           />
         </div>
-        <button class="remove-btn" onclick={() => ovrigaBolag.splice(i, 1)} aria-label="Ta bort bolag {i + 1}">&times;</button>
+        <button class="remove-btn" onclick={() => ovrigaBolag.splice(i, 1)} aria-label="Ta bort {bolag.namn || 'Bolag ' + (i + 1)}">&times;</button>
       </div>
     {/each}
-    <button class="add-btn" onclick={() => ovrigaBolag.push(100)}>+ L&#228;gg till bolag</button>
+    <button class="add-btn" onclick={() => ovrigaBolag.push({ namn: '', andel: 100 })}>+ L&#228;gg till bolag</button>
   </div>
 
   <div class="input-group">
@@ -368,10 +374,32 @@
     margin-top: var(--spacing-sm);
   }
 
-  .ovriga-label {
+  .ovriga-namn {
     flex: 1;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    background: transparent;
+    border: 1.5px solid transparent;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-family: inherit;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    min-width: 0;
+  }
+
+  .ovriga-namn::placeholder {
     color: var(--color-text-muted);
+    font-style: italic;
+  }
+
+  .ovriga-namn:hover {
+    border-color: var(--color-border);
+  }
+
+  .ovriga-namn:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: white;
   }
 
   .remove-btn {
