@@ -1,6 +1,5 @@
 <script>
   import { formatSEK, formatPercent } from '../lib/formatters.js';
-  import { IBB_TABELL } from '../lib/constants.js';
 
   let {
     agarandel = $bindable(),
@@ -10,10 +9,7 @@
     omkostnadsbeloppHolding = $bindable(),
     ovrigaBolag = $bindable(),
     dotterbolagOverride = $bindable(),
-    utdelningsar = $bindable(),
   } = $props();
-
-  const tillgangligaAr = Object.keys(IBB_TABELL).map(Number).sort((a, b) => a - b);
 
   function clamp(val, min, max) {
     return Math.min(max, Math.max(min, val));
@@ -52,25 +48,6 @@
 
 <div class="card input-panel">
   <h2>Parametrar</h2>
-
-  <div class="input-group year-group">
-    <div class="input-header">
-      <label for="utdelningsar">Utdelnings&aring;r</label>
-      <select id="utdelningsar" class="year-select" bind:value={utdelningsar}>
-        {#each tillgangligaAr as ar}
-          <option value={ar}>{ar}</option>
-        {/each}
-      </select>
-    </div>
-    <p class="input-help">
-      IBB {IBB_TABELL[utdelningsar].ibb.toLocaleString('sv-SE')} kr &middot; SLR {(IBB_TABELL[utdelningsar].slr * 100).toFixed(2).replace('.', ',')}%
-    </p>
-    {#if IBB_TABELL[utdelningsar].preliminary}
-      <p class="preliminary-warning">
-        &#9888;&#65039; IBB {utdelningsar} och SLR 30 nov {utdelningsar - 1} &auml;r inte fastst&auml;llda &auml;nnu. V&auml;rdena &auml;r prelimin&auml;ra uppskattningar &mdash; uppdatera constants.js n&auml;r officiella siffror publiceras.
-      </p>
-    {/if}
-  </div>
 
   <div class="input-group">
     <div class="input-header">
@@ -193,36 +170,30 @@
       Grundbeloppet (4 &times; IBB) &#228;r gemensamt f&#246;r alla dina f&#229;mansbolag.
       &#196;ger du andelar i fler bolag s&#229; proportioneras det.
     </p>
-    {#each ovrigaBolag as bolag, i}
+    {#each ovrigaBolag as _, i}
       <div class="ovriga-row">
-        <input
-          class="ovriga-namn"
-          type="text"
-          placeholder="Bolag {i + 1}"
-          bind:value={ovrigaBolag[i].namn}
-          onkeydown={handleKeydown}
-        />
+        <span class="ovriga-label">Bolag {i + 1}</span>
         <div class="input-value-wrapper">
           <input
             class="input-number"
             type="text"
             inputmode="numeric"
-            value={formatPercent(bolag.andel)}
+            value={formatPercent(ovrigaBolag[i])}
             onfocus={handleFocus}
             onblur={(e) => {
               const val = parseNumber(e.target.value);
               if (!isNaN(val)) {
-                ovrigaBolag[i].andel = clamp(roundTo(val, 2), 1, 100);
-                e.target.value = formatPercent(ovrigaBolag[i].andel);
+                ovrigaBolag[i] = clamp(roundTo(val, 2), 1, 100);
+                e.target.value = formatPercent(ovrigaBolag[i]);
               }
             }}
             onkeydown={handleKeydown}
           />
         </div>
-        <button class="remove-btn" onclick={() => ovrigaBolag.splice(i, 1)} aria-label="Ta bort {bolag.namn || 'Bolag ' + (i + 1)}">&times;</button>
+        <button class="remove-btn" onclick={() => ovrigaBolag.splice(i, 1)} aria-label="Ta bort bolag {i + 1}">&times;</button>
       </div>
     {/each}
-    <button class="add-btn" onclick={() => ovrigaBolag.push({ namn: '', andel: 100 })}>+ L&#228;gg till bolag</button>
+    <button class="add-btn" onclick={() => ovrigaBolag.push(100)}>+ L&#228;gg till bolag</button>
   </div>
 
   <div class="input-group">
@@ -390,44 +361,6 @@
     padding: var(--spacing-sm) var(--spacing-md);
   }
 
-  .year-group {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    padding: var(--spacing-sm) var(--spacing-md);
-  }
-
-  .year-select {
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    background: transparent;
-    border: 1.5px solid transparent;
-    border-radius: 6px;
-    padding: 2px 8px;
-    cursor: pointer;
-    transition: border-color 0.15s ease;
-  }
-
-  .year-select:hover,
-  .year-select:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    background: var(--color-surface);
-  }
-
-  .preliminary-warning {
-    margin-top: var(--spacing-xs);
-    font-size: 0.78rem;
-    color: #92400e;
-    background: #fef3c7;
-    border: 1px solid #fcd34d;
-    border-radius: 6px;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-style: normal;
-  }
-
   .ovriga-row {
     display: flex;
     align-items: center;
@@ -435,32 +368,10 @@
     margin-top: var(--spacing-sm);
   }
 
-  .ovriga-namn {
+  .ovriga-label {
     flex: 1;
-    font-size: 0.85rem;
-    color: var(--color-text);
-    background: transparent;
-    border: 1.5px solid transparent;
-    border-radius: 6px;
-    padding: 3px 8px;
-    font-family: inherit;
-    transition: border-color 0.15s ease, background-color 0.15s ease;
-    min-width: 0;
-  }
-
-  .ovriga-namn::placeholder {
+    font-size: 0.9rem;
     color: var(--color-text-muted);
-    font-style: italic;
-  }
-
-  .ovriga-namn:hover {
-    border-color: var(--color-border);
-  }
-
-  .ovriga-namn:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    background: white;
   }
 
   .remove-btn {

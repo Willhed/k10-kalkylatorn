@@ -1,6 +1,6 @@
 <script>
   import { beraknaGransbelopp } from './lib/calculations.js';
-  import { IBB_TABELL, UTDELNINGSAR_DEFAULT, LONEAVDRAG_FACTOR, LONEBASERAT_PERCENTAGE, LONEBASERAT_CAP_FACTOR, RANTA_TILLAGG } from './lib/constants.js';
+  import { IBB, LONEAVDRAG_FACTOR, LONEBASERAT_PERCENTAGE, LONEBASERAT_CAP_FACTOR } from './lib/constants.js';
   import Header from './components/Header.svelte';
   import InputPanel from './components/InputPanel.svelte';
   import ComparisonChart from './components/ComparisonChart.svelte';
@@ -12,31 +12,25 @@
   let totalLonesumma = $state(2_000_000);
   let omkostnadsbeloppDirekt = $state(100_000);
   let omkostnadsbeloppHolding = $state(100_000);
-  // Övriga fåmansbolag: array av { namn: string, andel: number (procent) }
+  // Övriga fåmansbolag: array av ägarandelar i procent (t.ex. [100, 50])
   let ovrigaBolag = $state([]);
-  let ovrigaAgarandelar = $derived(ovrigaBolag.map(b => b.andel / 100));
+  let ovrigaAgarandelar = $derived(ovrigaBolag.map(a => a / 100));
   // Override: bestämmande inflytande utan kapitalandel >50%
   let dotterbolagOverride = $state(false);
   let arDotterbolag = $derived(agarandel > 50 || dotterbolagOverride);
-
-  // Utdelningsår styr vilket IBB och vilken SLR som används
-  let utdelningsar = $state(UTDELNINGSAR_DEFAULT);
-  let aktuelltIbb = $derived((IBB_TABELL[utdelningsar] ?? IBB_TABELL[UTDELNINGSAR_DEFAULT]).ibb);
-  let aktuelltSlr = $derived((IBB_TABELL[utdelningsar] ?? IBB_TABELL[UTDELNINGSAR_DEFAULT]).slr);
-  let aktuelltRantaProcent = $derived(aktuelltSlr + RANTA_TILLAGG);
 
   // Beräkna minsta lön för att undvika 50×-taket
   // 50×-tak: lönebaseratCap = 50 × egenLon ≥ lönebaseratRaw
   // → egenLon ≥ lönebaseratRaw / 50
   let egenLon = $derived(
     Math.ceil(
-      Math.max(0, (agarandel / 100) * totalLonesumma - LONEAVDRAG_FACTOR * aktuelltIbb)
+      Math.max(0, (agarandel / 100) * totalLonesumma - LONEAVDRAG_FACTOR * IBB)
         * LONEBASERAT_PERCENTAGE / LONEBASERAT_CAP_FACTOR
     )
   );
 
   let direktResult = $derived(
-    beraknaGransbelopp(agarandel / 100, totalLonesumma, egenLon, omkostnadsbeloppDirekt, aktuelltIbb, ovrigaAgarandelar, aktuelltRantaProcent)
+    beraknaGransbelopp(agarandel / 100, totalLonesumma, egenLon, omkostnadsbeloppDirekt, IBB, ovrigaAgarandelar)
   );
 
   // Holdingbolag: du äger 100% av holding, holding äger samma andel av opco
@@ -48,7 +42,7 @@
     arDotterbolag ? egenLon : 0
   );
   let holdingResult = $derived(
-    beraknaGransbelopp(1.0, holdingLonesumma, holdingEgenLon, omkostnadsbeloppHolding, aktuelltIbb, ovrigaAgarandelar, aktuelltRantaProcent)
+    beraknaGransbelopp(1.0, holdingLonesumma, holdingEgenLon, omkostnadsbeloppHolding, IBB, ovrigaAgarandelar)
   );
 </script>
 
@@ -64,14 +58,13 @@
       bind:omkostnadsbeloppHolding
       bind:ovrigaBolag
       bind:dotterbolagOverride
-      bind:utdelningsar
     />
   </div>
 
   <div class="right-col">
     <SavingsCard {direktResult} {holdingResult} />
     <ComparisonChart {direktResult} {holdingResult} />
-    <ResultsTable {direktResult} {holdingResult} ibb={aktuelltIbb} rantaProcent={aktuelltRantaProcent} />
+    <ResultsTable {direktResult} {holdingResult} />
   </div>
 </div>
 
