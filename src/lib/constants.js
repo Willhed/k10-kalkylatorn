@@ -1,8 +1,8 @@
 // IBB och SLR per beskattningsår (utdelningsår).
 // K10 använder föregående års IBB; SLR är 30 nov föregående år.
 export const IBB_TABELL = {
-  2025: { ibb: 77_100, slr: 0.0262 },  // IBB 2024, SLR 30 nov 2024
-  2026: { ibb: 80_600, slr: 0.0255 },  // IBB 2025, SLR 30 nov 2025
+  2026: { ibb: 80_600, slr: 0.0255 },                       // IBB 2025, SLR 30 nov 2025
+  2027: { ibb: 83_000, slr: 0.0255, preliminary: true },    // IBB 2026 (preliminärt), SLR 30 nov 2026 (okänd – använder 2025 tills vidare)
 };
 export const UTDELNINGSAR_DEFAULT = 2026;
 

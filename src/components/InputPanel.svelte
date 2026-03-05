@@ -63,9 +63,13 @@
       </select>
     </div>
     <p class="input-help">
-      Styr vilket IBB och vilken statsl&aring;ner&auml;nta som anv&auml;nds i ber&auml;kningen.
       IBB {IBB_TABELL[utdelningsar].ibb.toLocaleString('sv-SE')} kr &middot; SLR {(IBB_TABELL[utdelningsar].slr * 100).toFixed(2).replace('.', ',')}%
     </p>
+    {#if IBB_TABELL[utdelningsar].preliminary}
+      <p class="preliminary-warning">
+        &#9888;&#65039; IBB {utdelningsar} och SLR 30 nov {utdelningsar - 1} &auml;r inte fastst&auml;llda &auml;nnu. V&auml;rdena &auml;r prelimin&auml;ra uppskattningar &mdash; uppdatera constants.js n&auml;r officiella siffror publiceras.
+      </p>
+    {/if}
   </div>
 
   <div class="input-group">
@@ -411,6 +415,17 @@
     outline: none;
     border-color: var(--color-primary);
     background: var(--color-surface);
+  }
+
+  .preliminary-warning {
+    margin-top: var(--spacing-xs);
+    font-size: 0.78rem;
+    color: #92400e;
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 6px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-style: normal;
   }
 
   .ovriga-row {
