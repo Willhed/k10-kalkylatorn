@@ -2,7 +2,7 @@
   <div class="explainer-grid">
 
     <div class="card explainer-card">
-      <h2>Vad är 3:12-reglerna?</h2>
+      <h2 class="card-title">Vad är 3:12-reglerna?</h2>
       <p>
         3:12-reglerna styr hur utdelning och kapitalvinst från fåmansbolag beskattas.
         Som ägare till ett fåmansbolag kan du ta ut utdelning till en lägre skattesats
@@ -17,7 +17,7 @@
     </div>
 
     <div class="card explainer-card">
-      <h2>Vad är gränsbelopp?</h2>
+      <h2 class="card-title">Vad är gränsbelopp?</h2>
       <p>
         Gränsbeloppet är det maximala belopp du kan ta ut som lågbeskattad
         utdelning (20&nbsp;%) under ett år. Det beräknas som summan av tre delar:
@@ -33,7 +33,7 @@
     </div>
 
     <div class="card explainer-card">
-      <h2>Varför holdingbolag?</h2>
+      <h2 class="card-title">Varför holdingbolag?</h2>
       <p>
         Många ägare väljer att äga sitt operativa bolag via ett holdingbolag.
         Fördelen är att utdelning från driftsbolaget till holdingbolaget är
@@ -48,30 +48,8 @@
       </p>
     </div>
 
-    <div class="card explainer-card full-width">
-      <h2>Vad f&ouml;r&auml;ndrades i 3:12-reglerna 2026?</h2>
-      <div class="changes-grid">
-        <div class="change-item">
-          <span class="change-label">Grundbeloppet h&ouml;js</span>
-          <p>Fr&aring;n 2,75 × IBB till <strong>4 × IBB</strong> per &auml;garprocentenhet. Gynnar &auml;gare med l&aring;g l&ouml;nesumma.</p>
-        </div>
-        <div class="change-item">
-          <span class="change-label">H&ouml;gre l&ouml;nekrav</span>
-          <p>Du m&aring;ste ta ut l&ouml;n motsvarande minst <strong>8 × IBB</strong> (ca 592&nbsp;000 kr 2026) f&ouml;r att f&aring; tillg&aring;ng till det l&ouml;nebaserade utrymmet — upp fr&aring;n 6 × IBB.</p>
-        </div>
-        <div class="change-item">
-          <span class="change-label">Sparat utdelningsutrymme</span>
-          <p>R&auml;knas inte l&auml;ngre upp med statsl&aring;ner&auml;ntan. Gammalt sparat utrymme beh&aring;ller sitt v&auml;rde men v&auml;xer inte mer.</p>
-        </div>
-        <div class="change-item">
-          <span class="change-label">Ny takregel f&ouml;r tj&auml;nsteinkomst</span>
-          <p>Utdelning &ouml;ver gr&auml;nsbeloppet tj&auml;nstebeskattas, men taket s&auml;tts vid <strong>100 × IBB</strong> (ca 7,4 Mkr). &Ouml;verskjutande del beskattas som kapital.</p>
-        </div>
-      </div>
-    </div>
-
     <div class="card explainer-card">
-      <h2>Direkt ägande vs holdingbolag</h2>
+      <h2 class="card-title">Direkt ägande vs holdingbolag</h2>
       <p>
         Vid <strong>direkt ägande</strong> äger du aktierna i driftsbolaget privat.
         Utdelning inom gränsbeloppet beskattas med 20&nbsp;%, resten som tjänst.
@@ -88,6 +66,28 @@
       </p>
     </div>
 
+    <div class="card explainer-card full-width">
+      <h2 class="card-title">Vad f&ouml;r&auml;ndrades i 3:12-reglerna 2026?</h2>
+      <div class="changes-grid">
+        <div class="change-item">
+          <span class="change-label">Grundbeloppet h&ouml;js</span>
+          <p>Fr&aring;n 2,75 × IBB till <strong>4 × IBB</strong> per &auml;garprocentenhet. Gynnar &auml;gare med l&aring;g l&ouml;nesumma.</p>
+        </div>
+        <div class="change-item">
+          <span class="change-label">L&ouml;nekravet avskaffas</span>
+          <p>Det personliga l&ouml;nekravet f&ouml;r delägaren tas bort — du beh&ouml;ver inte l&auml;ngre ta ut n&aring;gon viss l&ouml;n sj&auml;lv f&ouml;r att f&aring; tillg&aring;ng till det l&ouml;nebaserade utrymmet. L&ouml;neavdraget fr&aring;n bolagets l&ouml;nesumma h&ouml;js dock fr&aring;n 6 × IBB till <strong>8 × IBB</strong>.</p>
+        </div>
+        <div class="change-item">
+          <span class="change-label">Sparat utdelningsutrymme</span>
+          <p>R&auml;knas inte l&auml;ngre upp med statsl&aring;ner&auml;ntan. Gammalt sparat utrymme beh&aring;ller sitt v&auml;rde men v&auml;xer inte mer.</p>
+        </div>
+        <div class="change-item">
+          <span class="change-label">Ny takregel f&ouml;r tj&auml;nsteinkomst</span>
+          <p>Utdelning &ouml;ver gr&auml;nsbeloppet tj&auml;nstebeskattas, men taket s&auml;tts vid <strong>100 × IBB</strong> (ca 7,4 Mkr). &Ouml;verskjutande del beskattas som kapital.</p>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -102,7 +102,7 @@
     gap: var(--spacing-lg);
   }
 
-  .explainer-card h2 {
+  .card-title {
     font-size: 1.05rem;
     font-weight: 600;
     color: var(--color-primary);
