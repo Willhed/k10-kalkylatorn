@@ -102,6 +102,11 @@
     gap: var(--spacing-lg);
   }
 
+  /* Nollställ den globala .card + .card margin-top som inte gäller i ett grid */
+  .explainer-grid :global(.card) {
+    margin-top: 0;
+  }
+
   .card-title {
     font-size: 1.05rem;
     font-weight: 600;
