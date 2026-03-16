@@ -2,7 +2,7 @@
   <div class="explainer-grid">
 
     <div class="card explainer-card">
-      <h2>Vad är 3:12-reglerna?</h2>
+      <h2 class="card-title">Vad är 3:12-reglerna?</h2>
       <p>
         3:12-reglerna styr hur utdelning och kapitalvinst från fåmansbolag beskattas.
         Som ägare till ett fåmansbolag kan du ta ut utdelning till en lägre skattesats
@@ -17,7 +17,7 @@
     </div>
 
     <div class="card explainer-card">
-      <h2>Vad är gränsbelopp?</h2>
+      <h2 class="card-title">Vad är gränsbelopp?</h2>
       <p>
         Gränsbeloppet är det maximala belopp du kan ta ut som lågbeskattad
         utdelning (20&nbsp;%) under ett år. Det beräknas som summan av tre delar:
@@ -33,7 +33,7 @@
     </div>
 
     <div class="card explainer-card">
-      <h2>Varför holdingbolag?</h2>
+      <h2 class="card-title">Varför holdingbolag?</h2>
       <p>
         Många ägare väljer att äga sitt operativa bolag via ett holdingbolag.
         Fördelen är att utdelning från driftsbolaget till holdingbolaget är
@@ -49,7 +49,7 @@
     </div>
 
     <div class="card explainer-card full-width">
-      <h2>Vad f&ouml;r&auml;ndrades i 3:12-reglerna 2026?</h2>
+      <h2 class="card-title">Vad f&ouml;r&auml;ndrades i 3:12-reglerna 2026?</h2>
       <div class="changes-grid">
         <div class="change-item">
           <span class="change-label">Grundbeloppet h&ouml;js</span>
@@ -71,7 +71,7 @@
     </div>
 
     <div class="card explainer-card">
-      <h2>Direkt ägande vs holdingbolag</h2>
+      <h2 class="card-title">Direkt ägande vs holdingbolag</h2>
       <p>
         Vid <strong>direkt ägande</strong> äger du aktierna i driftsbolaget privat.
         Utdelning inom gränsbeloppet beskattas med 20&nbsp;%, resten som tjänst.
@@ -102,7 +102,7 @@
     gap: var(--spacing-lg);
   }
 
-  .explainer-card h2 {
+  .card-title {
     font-size: 1.05rem;
     font-weight: 600;
     color: var(--color-primary);
