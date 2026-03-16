@@ -6,6 +6,7 @@
   import ComparisonChart from './components/ComparisonChart.svelte';
   import ResultsTable from './components/ResultsTable.svelte';
   import SavingsCard from './components/SavingsCard.svelte';
+  import ExplainerSection from './components/ExplainerSection.svelte';
   import Footer from './components/Footer.svelte';
 
   let agarandel = $state(25);
@@ -67,6 +68,8 @@
     <ResultsTable {direktResult} {holdingResult} />
   </div>
 </div>
+
+<ExplainerSection />
 
 <Footer />
 

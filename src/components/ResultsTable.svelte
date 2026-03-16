@@ -4,7 +4,6 @@
 
   let { direktResult, holdingResult } = $props();
 
-  let savings = $derived(holdingResult.gransbelopp - direktResult.gransbelopp);
   let direktWins = $derived(direktResult.gransbelopp > holdingResult.gransbelopp);
   let diff = $derived(Math.abs(holdingResult.gransbelopp - direktResult.gransbelopp));
 </script>
