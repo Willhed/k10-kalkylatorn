@@ -28,7 +28,7 @@
         <li><strong>Ränta på omkostnadsbelopp</strong> — ditt anskaffningsvärde × (statslåneräntan + 9&nbsp;%)</li>
       </ul>
       <p>
-        Oanvänt gränsbelopp sparas till nästa år och räknas upp med statslåneräntan.
+        Oanvänt gränsbelopp sparas till nästa år (sparat utdelningsutrymme) men räknas inte längre upp med statslåneräntan — det är en av förändringarna i de nya 3:12-reglerna från 2026.
       </p>
     </div>
 
