@@ -20,7 +20,6 @@
   </div>
   <p class="disclaimer">
     Detta verktyg ger en f&ouml;renklad ber&auml;kning av gr&auml;nsbeloppet enligt de nya 3:12-reglerna.
-    Kontakta din revisor eller skatter&aring;dgivare f&ouml;r fullst&auml;ndig r&aring;dgivning.
   </p>
   <p class="sources">
     K&auml;llor:

@@ -48,6 +48,28 @@
       </p>
     </div>
 
+    <div class="card explainer-card full-width">
+      <h2>Vad f&ouml;r&auml;ndrades i 3:12-reglerna 2026?</h2>
+      <div class="changes-grid">
+        <div class="change-item">
+          <span class="change-label">Grundbeloppet h&ouml;js</span>
+          <p>Fr&aring;n 2,75 × IBB till <strong>4 × IBB</strong> per &auml;garprocentenhet. Gynnar &auml;gare med l&aring;g l&ouml;nesumma.</p>
+        </div>
+        <div class="change-item">
+          <span class="change-label">H&ouml;gre l&ouml;nekrav</span>
+          <p>Du m&aring;ste ta ut l&ouml;n motsvarande minst <strong>8 × IBB</strong> (ca 592&nbsp;000 kr 2026) f&ouml;r att f&aring; tillg&aring;ng till det l&ouml;nebaserade utrymmet — upp fr&aring;n 6 × IBB.</p>
+        </div>
+        <div class="change-item">
+          <span class="change-label">Sparat utdelningsutrymme</span>
+          <p>R&auml;knas inte l&auml;ngre upp med statsl&aring;ner&auml;ntan. Gammalt sparat utrymme beh&aring;ller sitt v&auml;rde men v&auml;xer inte mer.</p>
+        </div>
+        <div class="change-item">
+          <span class="change-label">Ny takregel f&ouml;r tj&auml;nsteinkomst</span>
+          <p>Utdelning &ouml;ver gr&auml;nsbeloppet tj&auml;nstebeskattas, men taket s&auml;tts vid <strong>100 × IBB</strong> (ca 7,4 Mkr). &Ouml;verskjutande del beskattas som kapital.</p>
+        </div>
+      </div>
+    </div>
+
     <div class="card explainer-card">
       <h2>Direkt ägande vs holdingbolag</h2>
       <p>
@@ -110,8 +132,50 @@
     margin-bottom: var(--spacing-xs);
   }
 
+  .full-width {
+    grid-column: 1 / -1;
+  }
+
+  .changes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-sm);
+  }
+
+  .change-item {
+    background: var(--color-primary-bg);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-md);
+  }
+
+  .change-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .change-item p {
+    font-size: 0.875rem;
+    color: var(--color-text);
+    line-height: 1.5;
+    margin-bottom: 0;
+  }
+
   @media (max-width: 900px) {
     .explainer-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .full-width {
+      grid-column: 1;
+    }
+
+    .changes-grid {
       grid-template-columns: 1fr;
     }
   }
