@@ -25,7 +25,7 @@
       <ul>
         <li><strong>Grundbelopp</strong> — din ägarandel × 4 × IBB (inkomstbasbeloppet)</li>
         <li><strong>Lönebaserat utrymme</strong> — baserat på lönesumman i bolaget minus ett löneavdrag om 8 × IBB</li>
-        <li><strong>Ränta på omkostnadsbelopp</strong> — ditt anskaffningsvärde × (statslåneräntan + 9&nbsp;%)</li>
+        <li><strong>Ränta på omkostnadsbelopp</strong> — (anskaffningsvärde − 100&nbsp;000&nbsp;kr) × (statslåneräntan + 9&nbsp;%)</li>
       </ul>
       <p>
         Oanvänt gränsbelopp sparas till nästa år (sparat utdelningsutrymme) men räknas inte längre upp med statslåneräntan — det är en av förändringarna i de nya 3:12-reglerna från 2026.
@@ -35,34 +35,29 @@
     <div class="card explainer-card">
       <h2 class="card-title">Varför holdingbolag?</h2>
       <p>
-        Många ägare väljer att äga sitt operativa bolag via ett holdingbolag.
-        Fördelen är att utdelning från driftsbolaget till holdingbolaget är
-        <strong>skattefri</strong> (näringsbetingade andelar), vilket gör att
-        du kan låta kapitalet växa i holdingbolaget utan att betala skatt förrän
-        du tar ut pengarna privat.
+        Den stora fördelen med ett holdingbolag är <strong>skatteuppskov</strong>.
+        Utdelning från driftsbolaget till holdingbolaget är skattefri
+        (näringsbetingade andelar), vilket innebär att du kan återinvestera
+        hela vinsten utan att betala privatskatt — du betalar först när du
+        faktiskt tar ut pengarna privat.
       </p>
       <p>
-        Om holdingbolaget har <strong>bestämmande inflytande</strong> (äger mer än
-        50&nbsp;% av kapitalet, eller har rätt att tillsätta styrelsen) räknas även
-        lönerna i driftsbolaget in i K10-beräkningen — precis som vid direkt ägande.
+        Det ger en kraftig ränta-på-ränta-effekt över tid. Holdingbolaget
+        fungerar också som en "kassa" om du säljer driftsbolaget — köpeskillingen
+        kan parkeras och återinvesteras skattefritt i ny verksamhet.
       </p>
     </div>
 
     <div class="card explainer-card">
       <h2 class="card-title">Direkt ägande vs holdingbolag</h2>
+      <ul>
+        <li><strong>Gränsbelopp</strong> — lika stort i båda fallen, förutsatt att holdingbolaget har bestämmande inflytande (äger &gt;50&nbsp;% av kapitalet eller styr styrelsetillsättningen).</li>
+        <li><strong>Skatt vid uttag</strong> — samma regler: 20&nbsp;% inom gränsbeloppet, tjänstebeskattning på överskott.</li>
+        <li><strong>Fördel holding</strong> — du styr när du tar ut privat; kapitalet växer obeskattad i mellanledet.</li>
+        <li><strong>Nackdel holding</strong> — ett bolag extra innebär mer bokföring, årsredovisning och initiala bolagskostnader.</li>
+      </ul>
       <p>
-        Vid <strong>direkt ägande</strong> äger du aktierna i driftsbolaget privat.
-        Utdelning inom gränsbeloppet beskattas med 20&nbsp;%, resten som tjänst.
-      </p>
-      <p>
-        Via <strong>holdingbolag</strong> äger du istället ett holdingbolag som
-        i sin tur äger driftsbolaget. Utdelningen kan parkeras i holdingbolaget
-        och återinvesteras utan omedelbar privatskatt. Nackdelen är något mer
-        administration och initiala bolagskostnader.
-      </p>
-      <p>
-        Kalkylatorn ovan hjälper dig se vilket alternativ ger störst
-        gränsbelopp givet din specifika situation.
+        Kalkylatorn visar vilket upplägg ger störst gränsbelopp i din situation.
       </p>
     </div>
 
