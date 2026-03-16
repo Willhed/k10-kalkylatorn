@@ -48,7 +48,7 @@
         <tr>
           <td>
             L&ouml;neunderlag
-            <span class="formula">andel i opco &times; total l&ouml;nesumma</span>
+            <span class="formula">&auml;garandel &times; total l&ouml;nesumma</span>
           </td>
           <td class="val">{formatSEK(direktResult.loneunderlag)}</td>
           {#if holdingResult.loneunderlag > 0}
