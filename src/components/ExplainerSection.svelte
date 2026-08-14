@@ -10,9 +10,8 @@
         Utdelning över gränsbeloppet beskattas istället som tjänsteinkomst (~50&nbsp;%).
       </p>
       <p>
-        Från 2026 gäller nya regler som höjer lönekravet och förändrar hur
-        gränsbeloppet beräknas. Det gör det viktigare än tidigare att planera
-        sin ägarstruktur och löneuttag noggrant.
+        Utdelning över gränsbeloppet beskattas istället som tjänsteinkomst (~50&nbsp;%)
+        — upp till takregeln på 90&nbsp;×&nbsp;IBB per år, därefter som kapital (30&nbsp;%).
       </p>
     </div>
 
@@ -77,8 +76,8 @@
           <p>R&auml;knas inte l&auml;ngre upp med statsl&aring;ner&auml;ntan. Gammalt sparat utrymme beh&aring;ller sitt v&auml;rde men v&auml;xer inte mer.</p>
         </div>
         <div class="change-item">
-          <span class="change-label">Ny takregel f&ouml;r tj&auml;nsteinkomst</span>
-          <p>Utdelning &ouml;ver gr&auml;nsbeloppet tj&auml;nstebeskattas, men taket s&auml;tts vid <strong>100 × IBB</strong> (ca 7,4 Mkr). &Ouml;verskjutande del beskattas som kapital.</p>
+          <span class="change-label">4&nbsp;%-sp&auml;rren slopas</span>
+          <p>Tidigare kr&auml;vdes minst 4&nbsp;% &auml;garandel f&ouml;r att f&aring; tillgodor&auml;kna sig l&ouml;nebaserat utrymme. Nu f&aring;r &auml;ven <strong>mindre delägare</strong> del av l&ouml;neunderlaget.</p>
         </div>
       </div>
     </div>
