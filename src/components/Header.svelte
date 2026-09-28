@@ -10,7 +10,7 @@
   <span class="badge">IBB {IBB_AR}: {formatSEK(IBB)}</span>
   <div class="cta-row">
     <span class="cta-label">Vill du ha personlig r&aring;dgivning?</span>
-    <a href={mailtoLink()} class="btn btn-primary" data-umami-event="Skicka mejl" data-umami-event-plats="header">Skicka mejl</a>
+    <a href={mailtoLink()} class="btn btn-primary" data-umami-event="Mejl – header">Skicka mejl</a>
   </div>
 </header>
 

@@ -5,7 +5,7 @@
 <footer class="footer">
   <div class="cta">
     <p class="cta-text">Vill du ha personlig r&aring;dgivning kring din 3:12-situation?</p>
-    <a href={mailtoLink()} class="btn btn-primary" data-umami-event="Skicka mejl" data-umami-event-plats="footer">Skicka mejl</a>
+    <a href={mailtoLink()} class="btn btn-primary" data-umami-event="Mejl – footer">Skicka mejl</a>
   </div>
   <p class="disclaimer">
     Detta verktyg ger en f&ouml;renklad ber&auml;kning av gr&auml;nsbeloppet enligt de nya 3:12-reglerna.
