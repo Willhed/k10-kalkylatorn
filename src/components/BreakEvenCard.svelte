@@ -1,6 +1,6 @@
 <script>
   import { formatSEK } from '../lib/formatters.js';
-  import { CALENDLY_URL, mailtoLink } from '../lib/contact.js';
+  import { mailtoLink } from '../lib/contact.js';
 
   let { breakEven, direktResult, holdingResult } = $props();
 
@@ -77,10 +77,7 @@
   {#if breakEven.lonsamt}
     <div class="cta">
       <p class="cta-text">Vill du ha hj&auml;lp att s&auml;tta upp holdingbolaget?</p>
-      <div class="cta-buttons">
-        <a href={CALENDLY_URL} target="_blank" rel="noopener" class="btn btn-primary">Boka tid</a>
-        <a href={mejl} class="btn btn-secondary">Skicka mejl</a>
-      </div>
+      <a href={mejl} class="btn btn-primary">Skicka mejl</a>
     </div>
   {/if}
 
@@ -181,11 +178,6 @@
     color: var(--color-primary);
   }
 
-  .cta-buttons {
-    display: flex;
-    gap: var(--spacing-sm);
-  }
-
   .btn {
     display: inline-block;
     padding: 6px var(--spacing-md);
@@ -204,12 +196,6 @@
   .btn-primary {
     background: var(--color-primary);
     color: #ffffff;
-  }
-
-  .btn-secondary {
-    background: #ffffff;
-    color: var(--color-primary);
-    border: 1px solid var(--color-primary-light);
   }
 
   .note {

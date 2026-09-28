@@ -1,5 +1,5 @@
 <script>
-  import { CALENDLY_URL, mailtoLink } from '../lib/contact.js';
+  import { mailtoLink } from '../lib/contact.js';
   import { IBB, IBB_AR } from '../lib/constants.js';
   import { formatSEK } from '../lib/formatters.js';
 </script>
@@ -10,16 +10,7 @@
   <span class="badge">IBB {IBB_AR}: {formatSEK(IBB)}</span>
   <div class="cta-row">
     <span class="cta-label">Vill du ha personlig r&aring;dgivning?</span>
-    <a
-      href={CALENDLY_URL}
-      target="_blank"
-      rel="noopener"
-      class="btn btn-primary"
-    >Boka tid</a>
-    <a
-      href={mailtoLink()}
-      class="btn btn-secondary"
-    >Skicka mejl</a>
+    <a href={mailtoLink()} class="btn btn-primary">Skicka mejl</a>
   </div>
 </header>
 
@@ -63,7 +54,8 @@
     background: var(--color-primary-bg);
     border-radius: var(--border-radius);
     border: 1px solid var(--color-border);
-    max-width: 480px;
+    width: fit-content;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
   }
@@ -91,11 +83,5 @@
   .btn-primary {
     background: var(--color-primary);
     color: #ffffff;
-  }
-
-  .btn-secondary {
-    background: #ffffff;
-    color: var(--color-primary);
-    border: 1px solid var(--color-primary-light);
   }
 </style>

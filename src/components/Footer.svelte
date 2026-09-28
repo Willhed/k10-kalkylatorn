@@ -1,26 +1,11 @@
 <script>
-  import { CALENDLY_URL, mailtoLink } from '../lib/contact.js';
+  import { mailtoLink } from '../lib/contact.js';
 </script>
 
 <footer class="footer">
   <div class="cta">
     <p class="cta-text">Vill du ha personlig r&aring;dgivning kring din 3:12-situation?</p>
-    <div class="cta-buttons">
-      <a
-        href={CALENDLY_URL}
-        target="_blank"
-        rel="noopener"
-        class="btn btn-primary"
-      >
-        Boka tid
-      </a>
-      <a
-        href={mailtoLink()}
-        class="btn btn-secondary"
-      >
-        Skicka mejl
-      </a>
-    </div>
+    <a href={mailtoLink()} class="btn btn-primary">Skicka mejl</a>
   </div>
   <p class="disclaimer">
     Detta verktyg ger en f&ouml;renklad ber&auml;kning av gr&auml;nsbeloppet enligt de nya 3:12-reglerna.
@@ -55,13 +40,6 @@
     color: var(--color-text-muted);
   }
 
-  .cta-buttons {
-    display: flex;
-    gap: var(--spacing-sm);
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
   .btn {
     display: inline-block;
     padding: var(--spacing-sm) var(--spacing-lg);
@@ -79,12 +57,6 @@
   .btn-primary {
     background: var(--color-primary);
     color: #ffffff;
-  }
-
-  .btn-secondary {
-    background: var(--color-primary-bg);
-    color: var(--color-primary);
-    border: 1px solid var(--color-primary-light);
   }
 
   .disclaimer {

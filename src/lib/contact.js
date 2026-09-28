@@ -1,4 +1,3 @@
-export const CALENDLY_URL = 'https://calendly.com/filipwillhed98/30min';
 export const CONTACT_EMAIL = 'filipwillhed98@live.se';
 
 /**
