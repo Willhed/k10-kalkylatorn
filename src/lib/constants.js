@@ -1,15 +1,25 @@
-// 3:12-reglerna använder föregående års IBB.
-// För beskattningsår 2026 → IBB 2025 = 80 600 kr
-export const IBB = 80_600;
-export const IBB_AR = 2025;
+// Värden per utdelningsår (= beskattningsår). Gränsbeloppet räknas på
+// föregående års inkomstbasbelopp (IBB) och statslåneräntan (SLR) den
+// 30 november föregående år.
+export const AR_VARDEN = {
+  2026: { ibb: 80_600, slr: 0.0255 }, // IBB 2025, SLR 30 nov 2025
+  2027: { ibb: 83_400, slr: null },   // IBB 2026; SLR 30 nov 2026 fastställs i början av december 2026
+};
+
+// Vid årsskiftet: byt här, så följer beräkningar och texter med.
+// Testerna stoppar ett byte till ett år där något värde saknas.
+export const UTDELNINGSAR = 2026;
+
+export const IBB = AR_VARDEN[UTDELNINGSAR].ibb;
+export const IBB_AR = UTDELNINGSAR - 1;
 
 // Grundbelopp: 4 × IBB
 export const GRUNDBELOPP_FACTOR = 4;
-export const GRUNDBELOPP_FULL = GRUNDBELOPP_FACTOR * IBB; // 322 400 kr
+export const GRUNDBELOPP_FULL = GRUNDBELOPP_FACTOR * IBB;
 
 // Löneavdrag: 8 × IBB
 export const LONEAVDRAG_FACTOR = 8;
-export const LONEAVDRAG = LONEAVDRAG_FACTOR * IBB; // 644 800 kr
+export const LONEAVDRAG = LONEAVDRAG_FACTOR * IBB;
 
 // Lönebaserat utrymme: 50% av (löneunderlag - löneavdrag)
 export const LONEBASERAT_PERCENTAGE = 0.50;
@@ -18,10 +28,9 @@ export const LONEBASERAT_PERCENTAGE = 0.50;
 export const LONEBASERAT_CAP_FACTOR = 50;
 
 // Ränta på omkostnadsbelopp: (omkostnadsbelopp - 100 000) × (SLR + 9%)
-// Statslåneräntan 30 nov 2025 = 2,55%
-export const SLR = 0.0255;
+export const SLR = AR_VARDEN[UTDELNINGSAR].slr;
 export const RANTA_TILLAGG = 0.09;
-export const RANTA_PROCENT = SLR + RANTA_TILLAGG; // 11,55%
+export const RANTA_PROCENT = SLR + RANTA_TILLAGG;
 export const OMKOSTNAD_TRÖSKEL = 100_000;
 
 // Skattesatser

@@ -1,11 +1,9 @@
 <script>
   import { formatSEK } from '../lib/formatters.js';
-  import { IBB_AR, KAPITALSKATT } from '../lib/constants.js';
+  import { UTDELNINGSAR, KAPITALSKATT } from '../lib/constants.js';
 
   let { direktResult, sparatUtrymme, egenLon } = $props();
 
-  // Gränsbeloppet beräknas på föregående års IBB, så det gäller utdelning året efter
-  const utdelningsar = IBB_AR + 1;
   let totalt = $derived(direktResult.gransbelopp + sparatUtrymme);
 </script>
 
@@ -15,7 +13,7 @@
   <div class="hero">
     <span class="hero-amount">{formatSEK(totalt)}</span>
     <span class="hero-label">
-      kan tas ut som utdelning till 20&nbsp;% skatt {utdelningsar}, vid direkt &auml;gande
+      kan tas ut som utdelning till 20&nbsp;% skatt {UTDELNINGSAR}, vid direkt &auml;gande
     </span>
   </div>
 

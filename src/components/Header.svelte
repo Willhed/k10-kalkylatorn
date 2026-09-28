@@ -1,13 +1,13 @@
 <script>
   import { mailtoLink } from '../lib/contact.js';
-  import { IBB, IBB_AR } from '../lib/constants.js';
+  import { IBB, UTDELNINGSAR } from '../lib/constants.js';
   import { formatSEK } from '../lib/formatters.js';
 </script>
 
 <header class="header">
   <h1>K10-kalkylatorn</h1>
   <p class="subtitle">R&auml;kna ut ditt utdelningsutrymme enligt nya 3:12-reglerna &mdash; och se om ett holdingbolag l&ouml;nar sig</p>
-  <span class="badge">IBB {IBB_AR}: {formatSEK(IBB)}</span>
+  <span class="badge">G&auml;ller utdelning {UTDELNINGSAR} &middot; IBB {formatSEK(IBB)}</span>
   <div class="cta-row">
     <span class="cta-label">Vill du ha personlig r&aring;dgivning?</span>
     <a href={mailtoLink()} class="btn btn-primary" data-umami-event="Mejl – header">Skicka mejl</a>
