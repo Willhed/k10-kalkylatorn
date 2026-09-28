@@ -4,60 +4,67 @@
   let { breakEven, direktResult, holdingResult } = $props();
 
   let holdingGerMer = $derived(holdingResult.gransbelopp > direktResult.gransbelopp);
+  let uttagText = $derived(
+    breakEven.planerad
+      ? `vid ${formatSEK(breakEven.uttag)} i utdelning`
+      : 'vid fullt uttag av gränsbeloppet'
+  );
 </script>
 
 <div class="card breakeven-card" class:lonsamt={breakEven.lonsamt}>
   <h2>L&ouml;nar sig holdingbolaget?</h2>
 
-  {#if breakEven.lonsamt}
-    <p class="verdict">
-      Ja, om du tar ut mer &auml;n <strong>{formatSEK(breakEven.breakEvenUttag)}</strong> per &aring;r.
+  <div class="hero">
+    <span class="hero-amount" class:positive={breakEven.lonsamt} class:negative={!breakEven.lonsamt}>
+      {breakEven.netto >= 0 ? '+' : '−'}{formatSEK(Math.abs(breakEven.netto))}
+    </span>
+    <span class="hero-label">netto per &aring;r {uttagText}</span>
+  </div>
+
+  <p class="verdict">
+    {#if breakEven.lonsamt && breakEven.planerad}
+      Ja. Holdingbolaget l&ouml;nar sig vid uttag &ouml;ver {formatSEK(breakEven.breakEvenUttag)} per &aring;r,
+      och du planerar {formatSEK(breakEven.uttag)}.
+    {:else if breakEven.lonsamt}
+      Ja, om du tar ut mer &auml;n {formatSEK(breakEven.breakEvenUttag)} per &aring;r.
+    {:else if breakEven.breakEvenUttag !== null}
+      Inte med {formatSEK(breakEven.uttag)} per &aring;r. Holdingbolaget l&ouml;nar sig f&ouml;rst
+      vid uttag &ouml;ver {formatSEK(breakEven.breakEvenUttag)}.
+    {:else}
+      Nej, inte p&aring; grund av utdelningsutrymmet.
+    {/if}
+  </p>
+
+  <dl class="ledger">
+    <div class="row">
+      <dt>Skattebesparing</dt>
+      <dd class="positive">+{formatSEK(breakEven.besparing)}</dd>
+    </div>
+    <div class="row">
+      <dt>Holdingbolagets kostnad</dt>
+      <dd class="negative">&minus;{formatSEK(breakEven.arligKostnad)}</dd>
+    </div>
+  </dl>
+
+  {#if breakEven.lonsamt && breakEven.startKostnad > 0}
+    <p class="payback">
+      Uppstartskostnaden p&aring; {formatSEK(breakEven.startKostnad)} &auml;r intj&auml;nad efter
+      ca <strong>{breakEven.aterbetalningManader} {breakEven.aterbetalningManader === 1 ? 'månad' : 'månader'}</strong>.
     </p>
-  {:else}
-    <p class="verdict">Nej, inte p&aring; grund av utdelningsutrymmet.</p>
   {/if}
 
-  {#if holdingGerMer}
-    <dl class="ledger">
-      <div class="row">
-        <dt>Skattebesparing vid fullt uttag</dt>
-        <dd class="positive">+{formatSEK(breakEven.maxBesparing)}</dd>
-      </div>
-      <div class="row">
-        <dt>Holdingbolagets kostnad</dt>
-        <dd class="negative">&minus;{formatSEK(breakEven.arligKostnad)}</dd>
-      </div>
-      <div class="row total">
-        <dt>Netto per &aring;r</dt>
-        <dd class:positive={breakEven.lonsamt} class:negative={!breakEven.lonsamt}>
-          {breakEven.nettoVidFulltUttag >= 0 ? '+' : '−'}{formatSEK(Math.abs(breakEven.nettoVidFulltUttag))}
-        </dd>
-      </div>
-    </dl>
-    {#if breakEven.lonsamt}
-      {#if breakEven.startKostnad > 0}
-        <p class="payback">
-          Uppstartskostnaden p&aring; {formatSEK(breakEven.startKostnad)} &auml;r intj&auml;nad efter
-          ca <strong>{breakEven.aterbetalningManader} {breakEven.aterbetalningManader === 1 ? 'månad' : 'månader'}</strong>
-          vid fullt uttag.
-        </p>
-      {/if}
-      <p class="explanation">
-        Upp till {formatSEK(direktResult.gransbelopp)} &auml;r skatten densamma i b&aring;da uppl&auml;ggen.
-        D&auml;r&ouml;ver sparar holdingbolaget skatt tills dess gr&auml;nsbelopp p&aring;
-        {formatSEK(holdingResult.gransbelopp)} &auml;r fullt utnyttjat.
-      </p>
-    {:else}
-      <p class="explanation">
-        &Auml;ven vid fullt uttag t&auml;cker skattebesparingen inte holdingbolagets kostnad.
-      </p>
-    {/if}
-  {:else}
-    <p class="explanation">
+  <p class="explanation">
+    {#if !holdingGerMer}
       Direkt &auml;gande ger lika mycket eller mer utdelningsutrymme i din situation,
       s&aring; holdingbolaget ger ingen skattevinst h&auml;r.
-    </p>
-  {/if}
+    {:else if breakEven.lagbeskattatExtra === 0}
+      Hela utdelningen ryms redan i direkt&auml;gandets gr&auml;nsbelopp p&aring;
+      {formatSEK(direktResult.gransbelopp)}, s&aring; holdingbolaget s&auml;nker inte skatten.
+    {:else}
+      {formatSEK(breakEven.lagbeskattatExtra)} av utdelningen beskattas med 20&nbsp;% i st&auml;llet
+      f&ouml;r ca 50&nbsp;% tack vare holdingbolagets h&ouml;gre gr&auml;nsbelopp.
+    {/if}
+  </p>
 
   <p class="note">
     R&auml;knar bara p&aring; utdelningsutrymmet. Skatteuppskovet &mdash; att kunna &aring;terinvestera
@@ -70,17 +77,32 @@
     font-size: 1.15rem;
     font-weight: 600;
     color: var(--color-primary);
-    margin-bottom: var(--spacing-sm);
-  }
-
-  .verdict {
-    font-size: 1.15rem;
-    font-weight: 600;
     margin-bottom: var(--spacing-md);
   }
 
-  .lonsamt .verdict strong {
-    color: var(--color-success);
+  .hero {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .hero-amount {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-top: var(--spacing-xs);
+  }
+
+  .verdict {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
   }
 
   .ledger {
@@ -99,13 +121,6 @@
   .row dd {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-  }
-
-  .row.total {
-    border-top: 1px solid var(--color-border);
-    margin-top: var(--spacing-xs);
-    padding-top: var(--spacing-sm);
-    font-weight: 700;
   }
 
   .positive {

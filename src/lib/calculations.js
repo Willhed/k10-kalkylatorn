@@ -74,35 +74,48 @@ export function beraknaGransbelopp(agarandel, totalLonesumma, egenLon, omkostnad
 }
 
 /**
- * Beräkna när holdingbolaget lönar sig, givet dess årliga merkostnad.
+ * Beräkna om holdingbolaget lönar sig, givet dess kostnader och ett utdelningsuttag.
  *
- * Varje krona som tas ut mellan direktgränsbeloppet och holdinggränsbeloppet
- * beskattas som kapital i stället för tjänst. Holdingbolaget lönar sig när
- * den skattevinsten täcker kostnaden: uttag > gränsDirekt + kostnad / skatteskillnad.
+ * Utdelning upp till direktgränsbeloppet beskattas lika i båda uppläggen. Den del
+ * som ligger mellan direkt- och holdinggränsbeloppet beskattas som kapital i stället
+ * för tjänst tack vare holdingbolaget. Holdingbolaget lönar sig när den skattevinsten
+ * täcker den årliga kostnaden: uttag > gränsDirekt + kostnad / skatteskillnad.
  *
  * @param {number} gransDirekt - Gränsbelopp vid direkt ägande (kr)
  * @param {number} gransHolding - Gränsbelopp via holdingbolag (kr)
  * @param {number} arligKostnad - Holdingbolagets årliga merkostnad (kr)
  * @param {number} startKostnad - Engångskostnad för att starta holdingbolaget (kr)
- * @returns {object} Besparing, netto, break-even-uttag (null om det aldrig lönar sig)
- *   och antal månader tills startkostnaden är intjänad vid fullt uttag
+ * @param {number|null} planeradUtdelning - Planerat årligt uttag (kr); null = fullt uttag av holdinggränsbeloppet
+ * @returns {object} Besparing och netto vid uttaget, break-even-uttag (null om det
+ *   aldrig lönar sig) och antal månader tills startkostnaden är intjänad
  */
-export function beraknaBreakEven(gransDirekt, gransHolding, arligKostnad, startKostnad = 0) {
+export function beraknaBreakEven(gransDirekt, gransHolding, arligKostnad, startKostnad = 0, planeradUtdelning = null) {
   const skatteskillnad = PROGRESSIV_SKATT_APPROX - KAPITALSKATT;
-  const maxBesparing = Math.max(0, gransHolding - gransDirekt) * skatteskillnad;
-  const nettoVidFulltUttag = maxBesparing - arligKostnad;
-  const lonsamt = nettoVidFulltUttag > 0;
-  const breakEvenUttag = lonsamt ? gransDirekt + arligKostnad / skatteskillnad : null;
-  const aterbetalningManader = lonsamt ? Math.ceil(startKostnad / (nettoVidFulltUttag / 12)) : null;
+  const extraUtrymme = Math.max(0, gransHolding - gransDirekt);
+  const planerad = planeradUtdelning != null;
+  const uttag = planerad ? planeradUtdelning : gransHolding;
+
+  // Den del av uttaget som bara ryms inom gränsbeloppet tack vare holdingbolaget
+  const lagbeskattatExtra = Math.min(Math.max(0, uttag - gransDirekt), extraUtrymme);
+  const besparing = lagbeskattatExtra * skatteskillnad;
+  const netto = besparing - arligKostnad;
+  const lonsamt = netto > 0;
+
+  const kanLona = extraUtrymme * skatteskillnad > arligKostnad;
+  const breakEvenUttag = kanLona ? gransDirekt + arligKostnad / skatteskillnad : null;
+  const aterbetalningManader = lonsamt ? Math.ceil(startKostnad / (netto / 12)) : null;
 
   return {
     arligKostnad,
     startKostnad,
-    aterbetalningManader,
-    maxBesparing,
-    nettoVidFulltUttag,
+    planerad,
+    uttag,
+    lagbeskattatExtra,
+    besparing,
+    netto,
     lonsamt,
     breakEvenUttag,
+    aterbetalningManader,
   };
 }
 

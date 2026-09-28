@@ -9,6 +9,8 @@
     omkostnadsbeloppHolding = $bindable(),
     holdingKostnad = $bindable(),
     holdingStartKostnad = $bindable(),
+    planeradUtdelningAktiv = $bindable(),
+    planeradUtdelning = $bindable(),
     ovrigaBolag = $bindable(),
     dotterbolagOverride = $bindable(),
   } = $props();
@@ -299,6 +301,44 @@
     </div>
     <p class="input-help">Eng&aring;ngskostnad: bolagsordning, registrering och r&aring;dgivning</p>
   </div>
+
+  <div class="input-group">
+    <label class="checkbox-row">
+      <input type="checkbox" bind:checked={planeradUtdelningAktiv} />
+      <span>R&auml;kna p&aring; min planerade utdelning</span>
+    </label>
+    {#if planeradUtdelningAktiv}
+      <div class="input-header planned-header">
+        <label for="planerad-utdelning">Planerad utdelning per &aring;r</label>
+        <div class="input-value-wrapper">
+          <input
+            class="input-number"
+            type="text"
+            inputmode="numeric"
+            value={formatSEK(planeradUtdelning)}
+            onfocus={handleFocus}
+            onblur={(e) => handleBlur(e, 0, Infinity, (v) => planeradUtdelning = v, formatSEK)}
+            onkeydown={handleKeydown}
+          />
+        </div>
+      </div>
+      <input
+        id="planerad-utdelning"
+        type="range"
+        min="0"
+        max="2000000"
+        step="10000"
+        value={Math.min(planeradUtdelning, 2000000)}
+        oninput={(e) => planeradUtdelning = Number(e.target.value)}
+      />
+      <div class="range-labels">
+        <span>0 kr</span>
+        <span>1 Mkr</span>
+        <span>2 Mkr</span>
+      </div>
+    {/if}
+    <p class="input-help">Annars r&auml;knar kalkylatorn som om hela holdingbolagets gr&auml;nsbelopp tas ut</p>
+  </div>
 </div>
 
 <style>
@@ -504,6 +544,10 @@
   .add-btn:hover {
     background: var(--color-surface);
     border-color: var(--color-primary);
+  }
+
+  .planned-header {
+    margin-top: var(--spacing-md);
   }
 
   .checkbox-row {

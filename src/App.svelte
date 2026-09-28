@@ -17,6 +17,9 @@
   // Holdingbolagets kostnader: årlig (bokföring, årsredovisning) och engångs (uppstart)
   let holdingKostnad = $state(5_000);
   let holdingStartKostnad = $state(7_500);
+  // Valfritt: räkna på planerad årlig utdelning i stället för fullt uttag
+  let planeradUtdelningAktiv = $state(false);
+  let planeradUtdelning = $state(200_000);
   // Övriga fåmansbolag: array av { namn: string, andel: number (procent) }
   let ovrigaBolag = $state([]);
   let ovrigaAgarandelar = $derived(ovrigaBolag.map(b => b.andel / 100));
@@ -51,7 +54,13 @@
   );
 
   let breakEven = $derived(
-    beraknaBreakEven(direktResult.gransbelopp, holdingResult.gransbelopp, holdingKostnad, holdingStartKostnad)
+    beraknaBreakEven(
+      direktResult.gransbelopp,
+      holdingResult.gransbelopp,
+      holdingKostnad,
+      holdingStartKostnad,
+      planeradUtdelningAktiv ? planeradUtdelning : null,
+    )
   );
 </script>
 
@@ -67,6 +76,8 @@
       bind:omkostnadsbeloppHolding
       bind:holdingKostnad
       bind:holdingStartKostnad
+      bind:planeradUtdelningAktiv
+      bind:planeradUtdelning
       bind:ovrigaBolag
       bind:dotterbolagOverride
     />
