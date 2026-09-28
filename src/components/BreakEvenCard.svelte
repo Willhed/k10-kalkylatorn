@@ -16,7 +16,7 @@
   let uttagText = $derived(
     breakEven.planerad
       ? `vid ${formatSEK(breakEven.uttag)} i utdelning`
-      : 'vid fullt uttag av gränsbeloppet'
+      : `vid ${formatSEK(breakEven.uttag)} i utdelning (hela holdingbolagets gränsbelopp)`
   );
 
   let mejl = $derived(
