@@ -2,15 +2,21 @@
   import { formatSEK, formatPercentDecimal } from '../lib/formatters.js';
   import { KAPITALSKATT, PROGRESSIV_SKATT_APPROX } from '../lib/constants.js';
 
+  // Förklarar varför holdingbolaget ger skattevinst. Själva besparingen i kronor
+  // visas bara i break-even-kortet, där den följer användarens utdelning.
   let { direktResult, holdingResult } = $props();
 
   let diff = $derived(Math.abs(holdingResult.gransbelopp - direktResult.gransbelopp));
   let holdingWins = $derived(holdingResult.gransbelopp > direktResult.gransbelopp);
-  let direktWins = $derived(direktResult.gransbelopp > holdingResult.gransbelopp);
   let isEqual = $derived(diff < 1);
 
-  // Potentiell skattebesparing: skillnaden × (progressiv skatt - kapitalskatt)
-  let taxSavings = $derived(diff * (PROGRESSIV_SKATT_APPROX - KAPITALSKATT));
+  // Holdingbolaget får alltid minst lika stort grundbelopp, så direkt ägande vinner
+  // bara på lönebaserat utrymme eller ränta på omkostnadsbelopp.
+  let direktSkal = $derived(
+    direktResult.lonebaseratUtrymme > holdingResult.lonebaseratUtrymme
+      ? 'Holdingbolaget får inte räkna med bolagets löner när ägarandelen är högst 50 %, och det lönebaserade utrymmet väger tyngre än holdingbolagets högre grundbelopp.'
+      : 'Ditt omkostnadsbelopp vid direkt ägande ger mer utrymme än holdingbolagets.'
+  );
 </script>
 
 {#if isEqual}
@@ -27,40 +33,23 @@
         <span class="savings-amount positive">+{formatSEK(diff)}</span>
       </div>
       <div class="savings-divider"></div>
-      <div class="savings-item">
-        <span class="savings-label">Skattebesparing f&ouml;re kostnader</span>
-        <span class="savings-amount highlight">~{formatSEK(taxSavings)}</span>
-        <span class="savings-detail">
-          Om skillnaden tas som utdelning
-          ({formatPercentDecimal(PROGRESSIV_SKATT_APPROX)} &rarr; {formatPercentDecimal(KAPITALSKATT)})
-        </span>
-      </div>
+      <p class="savings-explain">
+        Den delen kan tas ut till <strong>{formatPercentDecimal(KAPITALSKATT)}</strong> skatt
+        i st&auml;llet f&ouml;r ca <strong>{formatPercentDecimal(PROGRESSIV_SKATT_APPROX)}</strong>* som
+        tj&auml;nsteinkomst. Hur mycket du sparar beror p&aring; hur mycket du tar ut &mdash; se nedan.
+      </p>
     </div>
     <p class="approx-note">
-      * Skattebesparingen &auml;r uppskattad med en schablonm&auml;ssig progressiv skatt p&aring; {formatPercentDecimal(PROGRESSIV_SKATT_APPROX)}.
-      Din faktiska marginalskatt beror p&aring; din totala inkomst och din kommuns skattesats.
+      * En schablon. Din faktiska marginalskatt beror p&aring; din totala inkomst och din kommuns skattesats.
     </p>
   </div>
 {:else}
   <div class="card savings-card direkt-wins">
-    <div class="savings-grid">
-      <div class="savings-item">
-        <span class="savings-label">Direkt &auml;gande ger mer utdelningsutrymme</span>
-        <span class="savings-amount direkt-color">+{formatSEK(diff)}</span>
-        <span class="savings-detail">
-          L&ouml;neunderlaget i det operativa bolaget &ouml;verv&auml;ger holdingbolagets h&ouml;gre grundbelopp.
-        </span>
-      </div>
-      <div class="savings-divider direkt-divider"></div>
-      <div class="savings-item">
-        <span class="savings-label">Potentiell skattebesparing vid direkt &auml;gande</span>
-        <span class="savings-amount highlight">~{formatSEK(taxSavings)}</span>
-      </div>
+    <div class="savings-item">
+      <span class="savings-label">Direkt &auml;gande ger mer utdelningsutrymme</span>
+      <span class="savings-amount direkt-color">+{formatSEK(diff)}</span>
+      <span class="savings-detail">{direktSkal}</span>
     </div>
-    <p class="approx-note">
-      * Skattebesparingen &auml;r uppskattad med en schablonm&auml;ssig progressiv skatt p&aring; {formatPercentDecimal(PROGRESSIV_SKATT_APPROX)}.
-      Din faktiska marginalskatt beror p&aring; din totala inkomst och din kommuns skattesats.
-    </p>
   </div>
 {/if}
 
@@ -97,10 +86,6 @@
     flex-shrink: 0;
   }
 
-  .savings-divider.direkt-divider {
-    background: #93c5fd;
-  }
-
   .savings-item {
     display: flex;
     flex-direction: column;
@@ -128,14 +113,17 @@
     color: var(--color-primary-light);
   }
 
-  .savings-amount.highlight {
-    color: var(--color-primary);
-  }
-
   .savings-detail {
     font-size: 0.75rem;
     color: var(--color-text-muted);
     margin-top: var(--spacing-xs);
+  }
+
+  .savings-explain {
+    flex: 1;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--color-text);
   }
 
   .approx-note {
