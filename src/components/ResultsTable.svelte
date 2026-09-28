@@ -8,8 +8,11 @@
   let diff = $derived(Math.abs(holdingResult.gransbelopp - direktResult.gransbelopp));
 </script>
 
-<div class="card table-card">
-  <h2>Detaljerad ber&auml;kning</h2>
+<details class="card table-card">
+  <summary>
+    <h2>Detaljerad ber&auml;kning</h2>
+    <span class="summary-hint">Komponent f&ouml;r komponent, direkt &auml;gande mot holdingbolag</span>
+  </summary>
   <div class="table-wrapper">
     <table>
       <thead>
@@ -142,14 +145,58 @@
       {formatSEK(holdingResult.rawGrundbelopp)} (holding).
     </div>
   {/if}
-</div>
+</details>
 
 <style>
+  summary {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: var(--spacing-md);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  /* Dölj webbläsarens egen markör; vi ritar en pil till höger */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    content: '';
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid var(--color-primary);
+    border-bottom: 2px solid var(--color-primary);
+    transform: rotate(45deg);
+    transition: transform 0.15s ease;
+  }
+
+  details[open] summary::after {
+    transform: rotate(-135deg);
+  }
+
+  details[open] summary {
+    margin-bottom: var(--spacing-md);
+  }
+
+  summary:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
   .table-card h2 {
     font-size: 1.15rem;
     font-weight: 600;
-    margin-bottom: var(--spacing-md);
     color: var(--color-primary);
+  }
+
+  .summary-hint {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
   }
 
   .table-wrapper {
