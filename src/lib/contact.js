@@ -1,5 +1,6 @@
 export const CONTACT_EMAIL = 'filipwillhed98@live.se';
-export const SITE_URL = 'https://k10-kalkylatorn.se/';
+// Sidans huvudadress; k10-kalkylatorn.se skickar vidare hit
+export const SITE_URL = 'https://www.k10-kalkylatorn.se/';
 
 /**
  * Bygg en mailto-länk med förifyllt ämne och meddelande.
