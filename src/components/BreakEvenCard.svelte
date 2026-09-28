@@ -1,5 +1,6 @@
 <script>
   import { formatSEK } from '../lib/formatters.js';
+  import { CALENDLY_URL, mailtoLink } from '../lib/contact.js';
 
   let { breakEven, direktResult, holdingResult } = $props();
 
@@ -8,6 +9,13 @@
     breakEven.planerad
       ? `vid ${formatSEK(breakEven.uttag)} i utdelning`
       : 'vid fullt uttag av gränsbeloppet'
+  );
+
+  let mejl = $derived(
+    mailtoLink(
+      'Hjälp med holdingbolag',
+      `Hej!\n\nEnligt K10-kalkylatorn skulle ett holdingbolag ge mig ca ${formatSEK(breakEven.netto)} netto per år ${uttagText}. Jag vill gärna ha hjälp att sätta upp det.\n\n`
+    )
   );
 </script>
 
@@ -65,6 +73,16 @@
       f&ouml;r ca 50&nbsp;% tack vare holdingbolagets h&ouml;gre gr&auml;nsbelopp.
     {/if}
   </p>
+
+  {#if breakEven.lonsamt}
+    <div class="cta">
+      <p class="cta-text">Vill du ha hj&auml;lp att s&auml;tta upp holdingbolaget?</p>
+      <div class="cta-buttons">
+        <a href={CALENDLY_URL} target="_blank" rel="noopener" class="btn btn-primary">Boka tid</a>
+        <a href={mejl} class="btn btn-secondary">Skicka mejl</a>
+      </div>
+    </div>
+  {/if}
 
   <p class="note">
     R&auml;knar bara p&aring; utdelningsutrymmet. Skatteuppskovet &mdash; att kunna &aring;terinvestera
@@ -143,6 +161,55 @@
     font-size: 0.9rem;
     color: var(--color-text);
     margin-bottom: var(--spacing-sm);
+  }
+
+  .cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+    border: 1px solid var(--color-primary-light);
+    background: var(--color-primary-bg);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-md);
+    margin: var(--spacing-md) 0;
+  }
+
+  .cta-text {
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 6px var(--spacing-md);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+
+  .btn:hover {
+    opacity: 0.85;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: #ffffff;
+  }
+
+  .btn-secondary {
+    background: #ffffff;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary-light);
   }
 
   .note {

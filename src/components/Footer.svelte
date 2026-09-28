@@ -1,9 +1,13 @@
+<script>
+  import { CALENDLY_URL, mailtoLink } from '../lib/contact.js';
+</script>
+
 <footer class="footer">
   <div class="cta">
     <p class="cta-text">Vill du ha personlig r&aring;dgivning kring din 3:12-situation?</p>
     <div class="cta-buttons">
       <a
-        href="https://calendly.com/filipwillhed98/30min"
+        href={CALENDLY_URL}
         target="_blank"
         rel="noopener"
         class="btn btn-primary"
@@ -11,7 +15,7 @@
         Boka tid
       </a>
       <a
-        href="mailto:filipwillhed98@live.se"
+        href={mailtoLink()}
         class="btn btn-secondary"
       >
         Skicka mejl

@@ -1,4 +1,5 @@
 <script>
+  import { CALENDLY_URL, mailtoLink } from '../lib/contact.js';
   import { IBB, IBB_AR } from '../lib/constants.js';
   import { formatSEK } from '../lib/formatters.js';
 </script>
@@ -10,13 +11,13 @@
   <div class="cta-row">
     <span class="cta-label">Vill du ha personlig r&aring;dgivning?</span>
     <a
-      href="https://calendly.com/filipwillhed98/30min"
+      href={CALENDLY_URL}
       target="_blank"
       rel="noopener"
       class="btn btn-primary"
     >Boka tid</a>
     <a
-      href="mailto:filipwillhed98@live.se"
+      href={mailtoLink()}
       class="btn btn-secondary"
     >Skicka mejl</a>
   </div>
