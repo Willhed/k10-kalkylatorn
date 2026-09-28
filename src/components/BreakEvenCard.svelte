@@ -1,8 +1,16 @@
 <script>
   import { formatSEK } from '../lib/formatters.js';
   import { mailtoLink } from '../lib/contact.js';
+  import { handleBlur, handleFocus, handleKeydown } from '../lib/numberInput.js';
 
-  let { breakEven, direktResult, holdingResult, shareUrl } = $props();
+  let {
+    breakEven,
+    direktResult,
+    holdingResult,
+    shareUrl,
+    planeradUtdelningAktiv = $bindable(),
+    planeradUtdelning = $bindable(),
+  } = $props();
 
   let holdingGerMer = $derived(holdingResult.gransbelopp > direktResult.gransbelopp);
   let uttagText = $derived(
@@ -27,6 +35,41 @@
       {breakEven.netto >= 0 ? '+' : '−'}{formatSEK(Math.abs(breakEven.netto))}
     </span>
     <span class="hero-label">netto per &aring;r {uttagText}</span>
+  </div>
+
+  <div class="plan">
+    <label class="plan-toggle">
+      <input type="checkbox" bind:checked={planeradUtdelningAktiv} />
+      <span>R&auml;kna p&aring; min planerade utdelning</span>
+    </label>
+    {#if planeradUtdelningAktiv}
+      <div class="plan-header">
+        <label for="planerad-utdelning">Planerad utdelning per &aring;r</label>
+        <input
+          class="input-number"
+          type="text"
+          inputmode="numeric"
+          value={formatSEK(planeradUtdelning)}
+          onfocus={handleFocus}
+          onblur={(e) => handleBlur(e, 0, Infinity, (v) => planeradUtdelning = v, formatSEK)}
+          onkeydown={handleKeydown}
+        />
+      </div>
+      <input
+        id="planerad-utdelning"
+        type="range"
+        min="0"
+        max="2000000"
+        step="10000"
+        value={Math.min(planeradUtdelning, 2000000)}
+        oninput={(e) => planeradUtdelning = Number(e.target.value)}
+      />
+      <div class="range-labels">
+        <span>0 kr</span>
+        <span>1 Mkr</span>
+        <span>2 Mkr</span>
+      </div>
+    {/if}
   </div>
 
   <p class="verdict">
@@ -112,6 +155,43 @@
     font-size: 0.85rem;
     color: var(--color-text-muted);
     margin-top: var(--spacing-xs);
+  }
+
+  .plan {
+    background: var(--color-bg);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    max-width: 420px;
+  }
+
+  .plan-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+
+  .plan-toggle input {
+    accent-color: var(--color-primary);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+
+  .plan-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--spacing-sm);
+    margin: var(--spacing-sm) 0;
+    font-size: 0.875rem;
+  }
+
+  .plan-header .input-number {
+    margin-left: auto;
   }
 
   .verdict {

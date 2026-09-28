@@ -111,8 +111,6 @@
       bind:omkostnadsbeloppHolding
       bind:holdingKostnad
       bind:holdingStartKostnad
-      bind:planeradUtdelningAktiv
-      bind:planeradUtdelning
       bind:ovrigaBolag
       bind:dotterbolagOverride
       {shareUrl}
@@ -136,7 +134,14 @@
     </section>
 
     <SavingsCard {direktResult} {holdingResult} />
-    <BreakEvenCard {breakEven} {direktResult} {holdingResult} {shareUrl} />
+    <BreakEvenCard
+      {breakEven}
+      {direktResult}
+      {holdingResult}
+      {shareUrl}
+      bind:planeradUtdelningAktiv
+      bind:planeradUtdelning
+    />
     <ComparisonChart {direktResult} {holdingResult} />
     <ResultsTable {direktResult} {holdingResult} />
   </div>

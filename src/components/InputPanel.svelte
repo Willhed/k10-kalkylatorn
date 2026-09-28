@@ -1,5 +1,6 @@
 <script>
   import { formatSEK, formatPercent } from '../lib/formatters.js';
+  import { clamp, parseNumber, roundTo, handleBlur, handleFocus, handleKeydown } from '../lib/numberInput.js';
 
   let {
     agarandel = $bindable(),
@@ -10,40 +11,10 @@
     omkostnadsbeloppHolding = $bindable(),
     holdingKostnad = $bindable(),
     holdingStartKostnad = $bindable(),
-    planeradUtdelningAktiv = $bindable(),
-    planeradUtdelning = $bindable(),
     ovrigaBolag = $bindable(),
     dotterbolagOverride = $bindable(),
     shareUrl,
   } = $props();
-
-  function clamp(val, min, max) {
-    return Math.min(max, Math.max(min, val));
-  }
-
-  function parseNumber(str) {
-    // Allow dots and commas as decimal separators
-    const cleaned = str.replace(/[^\d.,]/g, '').replace(',', '.');
-    return parseFloat(cleaned);
-  }
-
-  function roundTo(val, decimals) {
-    const factor = 10 ** decimals;
-    return Math.round(val * factor) / factor;
-  }
-
-  function handleBlur(e, min, max, setter, formatter, decimals = 0) {
-    const val = parseNumber(e.target.value);
-    if (!isNaN(val)) {
-      const clamped = clamp(roundTo(val, decimals), min, max);
-      setter(clamped);
-      e.target.value = formatter(clamped);
-    }
-  }
-
-  function handleFocus(e) {
-    e.target.select();
-  }
 
   let kopierad = $state(false);
   let kopieringsfel = $state(false);
@@ -59,11 +30,6 @@
     }
   }
 
-  function handleKeydown(e) {
-    if (e.key === 'Enter') {
-      e.target.blur();
-    }
-  }
 </script>
 
 <div class="card input-panel">
@@ -367,44 +333,6 @@
     </div>
     <p class="input-help">Eng&aring;ngskostnad: bolagsordning, registrering och r&aring;dgivning</p>
   </div>
-
-  <div class="input-group">
-    <label class="checkbox-row">
-      <input type="checkbox" bind:checked={planeradUtdelningAktiv} />
-      <span>R&auml;kna p&aring; min planerade utdelning</span>
-    </label>
-    {#if planeradUtdelningAktiv}
-      <div class="input-header planned-header">
-        <label for="planerad-utdelning">Planerad utdelning per &aring;r</label>
-        <div class="input-value-wrapper">
-          <input
-            class="input-number"
-            type="text"
-            inputmode="numeric"
-            value={formatSEK(planeradUtdelning)}
-            onfocus={handleFocus}
-            onblur={(e) => handleBlur(e, 0, Infinity, (v) => planeradUtdelning = v, formatSEK)}
-            onkeydown={handleKeydown}
-          />
-        </div>
-      </div>
-      <input
-        id="planerad-utdelning"
-        type="range"
-        min="0"
-        max="2000000"
-        step="10000"
-        value={Math.min(planeradUtdelning, 2000000)}
-        oninput={(e) => planeradUtdelning = Number(e.target.value)}
-      />
-      <div class="range-labels">
-        <span>0 kr</span>
-        <span>1 Mkr</span>
-        <span>2 Mkr</span>
-      </div>
-    {/if}
-    <p class="input-help">Annars r&auml;knar kalkylatorn som om hela holdingbolagets gr&auml;nsbelopp tas ut</p>
-  </div>
 </div>
 
 <style>
@@ -491,79 +419,6 @@
     flex-shrink: 0;
     /* Håll fältet högerställt även när det bryts ner på egen rad */
     margin-left: auto;
-  }
-
-  .input-number {
-    font-weight: 700;
-    font-size: 1.05rem;
-    color: var(--color-primary);
-    font-variant-numeric: tabular-nums;
-    background: transparent;
-    border: 1.5px solid transparent;
-    border-radius: 6px;
-    padding: 2px 8px;
-    text-align: right;
-    /* Fast bredd som rymmer "15 000 000 kr" (reglagens max); standardbredden sprängde kortet på smala skärmar */
-    width: 8.8em;
-    max-width: 50vw;
-    font-family: inherit;
-    transition: border-color 0.15s ease, background-color 0.15s ease;
-  }
-
-  .input-number:hover {
-    border-color: var(--color-border);
-  }
-
-  .input-number:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    background: var(--color-surface);
-  }
-
-  input[type="range"] {
-    width: 100%;
-    height: 6px;
-    -webkit-appearance: none;
-    appearance: none;
-    background: var(--color-border);
-    border-radius: 3px;
-    outline: none;
-    cursor: pointer;
-  }
-
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    border: 3px solid var(--color-surface);
-    box-shadow: var(--shadow-md);
-    cursor: pointer;
-    transition: transform 0.15s ease;
-  }
-
-  input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.15);
-  }
-
-  input[type="range"]::-moz-range-thumb {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    border: 3px solid var(--color-surface);
-    box-shadow: var(--shadow-md);
-    cursor: pointer;
-  }
-
-  .range-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.75rem;
-    color: var(--color-text-muted);
-    margin-top: var(--spacing-xs);
   }
 
   .input-help {
@@ -665,10 +520,6 @@
   .add-btn:hover {
     background: var(--color-surface);
     border-color: var(--color-primary);
-  }
-
-  .planned-header {
-    margin-top: var(--spacing-md);
   }
 
   .checkbox-row {
