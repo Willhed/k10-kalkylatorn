@@ -1,11 +1,12 @@
 <script>
-  import { beraknaGransbelopp } from './lib/calculations.js';
+  import { beraknaGransbelopp, beraknaBreakEven } from './lib/calculations.js';
   import { IBB, LONEAVDRAG_FACTOR, LONEBASERAT_PERCENTAGE, LONEBASERAT_CAP_FACTOR } from './lib/constants.js';
   import Header from './components/Header.svelte';
   import InputPanel from './components/InputPanel.svelte';
   import ComparisonChart from './components/ComparisonChart.svelte';
   import ResultsTable from './components/ResultsTable.svelte';
   import SavingsCard from './components/SavingsCard.svelte';
+  import BreakEvenCard from './components/BreakEvenCard.svelte';
   import ExplainerSection from './components/ExplainerSection.svelte';
   import Footer from './components/Footer.svelte';
 
@@ -13,6 +14,8 @@
   let totalLonesumma = $state(2_000_000);
   let omkostnadsbeloppDirekt = $state(100_000);
   let omkostnadsbeloppHolding = $state(100_000);
+  // Holdingbolagets årliga merkostnad: bokföring, årsredovisning, bankavgifter
+  let holdingKostnad = $state(15_000);
   // Övriga fåmansbolag: array av { namn: string, andel: number (procent) }
   let ovrigaBolag = $state([]);
   let ovrigaAgarandelar = $derived(ovrigaBolag.map(b => b.andel / 100));
@@ -45,6 +48,10 @@
   let holdingResult = $derived(
     beraknaGransbelopp(1.0, holdingLonesumma, holdingEgenLon, omkostnadsbeloppHolding, IBB, ovrigaAgarandelar)
   );
+
+  let breakEven = $derived(
+    beraknaBreakEven(direktResult.gransbelopp, holdingResult.gransbelopp, holdingKostnad)
+  );
 </script>
 
 <Header />
@@ -57,6 +64,7 @@
       {egenLon}
       bind:omkostnadsbeloppDirekt
       bind:omkostnadsbeloppHolding
+      bind:holdingKostnad
       bind:ovrigaBolag
       bind:dotterbolagOverride
     />
@@ -64,6 +72,7 @@
 
   <div class="right-col">
     <SavingsCard {direktResult} {holdingResult} />
+    <BreakEvenCard {breakEven} {direktResult} {holdingResult} />
     <ComparisonChart {direktResult} {holdingResult} />
     <ResultsTable {direktResult} {holdingResult} />
   </div>

@@ -28,7 +28,7 @@
       </div>
       <div class="savings-divider"></div>
       <div class="savings-item">
-        <span class="savings-label">Potentiell skattebesparing</span>
+        <span class="savings-label">Skattebesparing f&ouml;re kostnader</span>
         <span class="savings-amount highlight">~{formatSEK(taxSavings)}</span>
         <span class="savings-detail">
           Om skillnaden tas som utdelning

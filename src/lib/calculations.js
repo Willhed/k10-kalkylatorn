@@ -74,6 +74,34 @@ export function beraknaGransbelopp(agarandel, totalLonesumma, egenLon, omkostnad
 }
 
 /**
+ * Beräkna när holdingbolaget lönar sig, givet dess årliga merkostnad.
+ *
+ * Varje krona som tas ut mellan direktgränsbeloppet och holdinggränsbeloppet
+ * beskattas som kapital i stället för tjänst. Holdingbolaget lönar sig när
+ * den skattevinsten täcker kostnaden: uttag > gränsDirekt + kostnad / skatteskillnad.
+ *
+ * @param {number} gransDirekt - Gränsbelopp vid direkt ägande (kr)
+ * @param {number} gransHolding - Gränsbelopp via holdingbolag (kr)
+ * @param {number} arligKostnad - Holdingbolagets årliga merkostnad (kr)
+ * @returns {object} Besparing, netto och break-even-uttag (null om det aldrig lönar sig)
+ */
+export function beraknaBreakEven(gransDirekt, gransHolding, arligKostnad) {
+  const skatteskillnad = PROGRESSIV_SKATT_APPROX - KAPITALSKATT;
+  const maxBesparing = Math.max(0, gransHolding - gransDirekt) * skatteskillnad;
+  const nettoVidFulltUttag = maxBesparing - arligKostnad;
+  const lonsamt = nettoVidFulltUttag > 0;
+  const breakEvenUttag = lonsamt ? gransDirekt + arligKostnad / skatteskillnad : null;
+
+  return {
+    arligKostnad,
+    maxBesparing,
+    nettoVidFulltUttag,
+    lonsamt,
+    breakEvenUttag,
+  };
+}
+
+/**
  * Beräkna skatt på utdelning givet gränsbelopp.
  *
  * @param {number} utdelning - Utdelningsbelopp (kr)

@@ -7,6 +7,7 @@
     egenLon,
     omkostnadsbeloppDirekt = $bindable(),
     omkostnadsbeloppHolding = $bindable(),
+    holdingKostnad = $bindable(),
     ovrigaBolag = $bindable(),
     dotterbolagOverride = $bindable(),
   } = $props();
@@ -232,6 +233,38 @@
       <span>5 Mkr</span>
     </div>
     <p class="input-help">Anskaffningsv&auml;rde f&ouml;r aktier i holdingbolaget</p>
+  </div>
+
+  <div class="input-group">
+    <div class="input-header">
+      <label for="holding-kostnad">&Aring;rlig kostnad f&ouml;r holdingbolaget</label>
+      <div class="input-value-wrapper">
+        <input
+          class="input-number"
+          type="text"
+          inputmode="numeric"
+          value={formatSEK(holdingKostnad)}
+          onfocus={handleFocus}
+          onblur={(e) => handleBlur(e, 0, Infinity, (v) => holdingKostnad = v, formatSEK)}
+          onkeydown={handleKeydown}
+        />
+      </div>
+    </div>
+    <input
+      id="holding-kostnad"
+      type="range"
+      min="0"
+      max="50000"
+      step="1000"
+      value={Math.min(holdingKostnad, 50000)}
+      oninput={(e) => holdingKostnad = Number(e.target.value)}
+    />
+    <div class="range-labels">
+      <span>0 kr</span>
+      <span>25 000 kr</span>
+      <span>50 000 kr</span>
+    </div>
+    <p class="input-help">Bokf&ouml;ring, &aring;rsredovisning och bankavgifter</p>
   </div>
 </div>
 
