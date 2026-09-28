@@ -14,7 +14,7 @@
   // bara på lönebaserat utrymme eller ränta på omkostnadsbelopp.
   let direktSkal = $derived(
     direktResult.lonebaseratUtrymme > holdingResult.lonebaseratUtrymme
-      ? 'Holdingbolaget får inte räkna med bolagets löner när ägarandelen är högst 50 %, och det lönebaserade utrymmet väger tyngre än holdingbolagets högre grundbelopp.'
+      ? 'Holdingbolaget får inte räkna med bolagets löner när det äger högst 50 % utan bestämmande inflytande, och det lönebaserade utrymmet väger tyngre än holdingbolagets högre grundbelopp. Har holdingbolaget bestämmande inflytande, t.ex. via röstmajoritet eller avtal, kryssa i det under Holdingbolag i panelen.'
       : 'Ditt omkostnadsbelopp vid direkt ägande ger mer utrymme än holdingbolagets.'
   );
 </script>
