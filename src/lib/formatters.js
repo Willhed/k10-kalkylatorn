@@ -20,12 +20,13 @@ export function formatPercent(value) {
 }
 
 /**
- * Formatera procent med decimaler: "20,0 %"
+ * Formatera procent med decimaler: "11,55 %" eller "20 %"
  */
 export function formatPercentDecimal(value) {
+  // Upp till två decimaler: räntesatsen 11,55 % får inte avrundas till 11,5 %
   return new Intl.NumberFormat('sv-SE', {
     style: 'percent',
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(value);
 }
