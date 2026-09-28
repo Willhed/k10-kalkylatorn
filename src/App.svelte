@@ -5,6 +5,7 @@
   import InputPanel from './components/InputPanel.svelte';
   import ResultsTable from './components/ResultsTable.svelte';
   import UtrymmeCard from './components/UtrymmeCard.svelte';
+  import MobileResultBar from './components/MobileResultBar.svelte';
   import SavingsCard from './components/SavingsCard.svelte';
   import BreakEvenCard from './components/BreakEvenCard.svelte';
   import ExplainerSection from './components/ExplainerSection.svelte';
@@ -58,6 +59,12 @@
   let holdingResult = $derived(
     beraknaGransbelopp(1.0, holdingLonesumma, holdingEgenLon, omkostnadsbeloppHolding, IBB, ovrigaAgarandelar)
   );
+
+  // Utdelningsutrymme vid direkt ägande: årets gränsbelopp plus sparat utrymme
+  let utrymme = $derived(direktResult.gransbelopp + sparatUtrymme);
+
+  // Resultatkolumnen; resultatraden på mobil döljs när den syns
+  let resultatKolumn = $state();
 
   let breakEven = $derived(
     beraknaBreakEven(
@@ -115,8 +122,8 @@
     />
   </div>
 
-  <div class="right-col">
-    <UtrymmeCard {direktResult} {sparatUtrymme} {egenLon} />
+  <div class="right-col" bind:this={resultatKolumn}>
+    <UtrymmeCard {direktResult} {sparatUtrymme} {egenLon} {utrymme} />
 
     <section class="step-two">
       <h2><span class="step">Steg 2</span> Skulle ett holdingbolag l&ouml;na sig?</h2>
@@ -147,6 +154,8 @@
 <ExplainerSection />
 
 <Footer />
+
+<MobileResultBar {utrymme} {breakEven} target={resultatKolumn} />
 
 <style>
   .app-layout {

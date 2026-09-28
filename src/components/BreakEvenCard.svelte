@@ -27,7 +27,7 @@
   );
 </script>
 
-<div class="card breakeven-card" class:lonsamt={breakEven.lonsamt}>
+<div class="card breakeven-card" id="holdingbolag" class:lonsamt={breakEven.lonsamt}>
   <h2>L&ouml;nar sig holdingbolaget?</h2>
 
   <div class="hero">

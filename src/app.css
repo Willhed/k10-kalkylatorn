@@ -50,6 +50,22 @@ body {
   line-height: 1.6;
 }
 
+/* Resultatradens länkar hoppar mjukt och landar med lite luft ovanför kortet */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+#utdelningsutrymme,
+#holdingbolag {
+  scroll-margin-top: var(--spacing-md);
+}
+
 #app {
   max-width: var(--max-width);
   margin: 0 auto;
@@ -183,4 +199,11 @@ input[type="range"]::-moz-range-thumb {
     padding: var(--spacing-lg);
   }
 
+}
+
+/* Plats för den fasta resultatraden på mobil, så att den inte täcker sidfoten */
+@media (max-width: 900px) {
+  #app {
+    padding-bottom: 5rem;
+  }
 }

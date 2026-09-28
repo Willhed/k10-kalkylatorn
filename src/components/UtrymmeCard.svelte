@@ -2,12 +2,10 @@
   import { formatSEK } from '../lib/formatters.js';
   import { UTDELNINGSAR, KAPITALSKATT } from '../lib/constants.js';
 
-  let { direktResult, sparatUtrymme, egenLon } = $props();
-
-  let totalt = $derived(direktResult.gransbelopp + sparatUtrymme);
+  let { direktResult, sparatUtrymme, egenLon, utrymme: totalt } = $props();
 </script>
 
-<div class="card utrymme-card">
+<div class="card utrymme-card" id="utdelningsutrymme">
   <h2><span class="step">Steg 1</span> Ditt utdelningsutrymme</h2>
 
   <div class="hero">
