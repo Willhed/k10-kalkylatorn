@@ -13,6 +13,7 @@
     planeradUtdelning = $bindable(),
     ovrigaBolag = $bindable(),
     dotterbolagOverride = $bindable(),
+    shareUrl,
   } = $props();
 
   function clamp(val, min, max) {
@@ -43,6 +44,20 @@
     e.target.select();
   }
 
+  let kopierad = $state(false);
+  let kopieringsfel = $state(false);
+
+  async function kopieraLank() {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      kopierad = true;
+      kopieringsfel = false;
+      setTimeout(() => (kopierad = false), 2000);
+    } catch {
+      kopieringsfel = true;
+    }
+  }
+
   function handleKeydown(e) {
     if (e.key === 'Enter') {
       e.target.blur();
@@ -51,7 +66,15 @@
 </script>
 
 <div class="card input-panel">
-  <h2>Parametrar</h2>
+  <div class="panel-header">
+    <h2>Parametrar</h2>
+    <button type="button" class="share-btn" onclick={kopieraLank}>
+      {kopierad ? 'Kopierad!' : 'Kopiera länk'}
+    </button>
+  </div>
+  {#if kopieringsfel}
+    <p class="input-help">Kunde inte kopiera. Kopiera l&auml;nken fr&aring;n adressf&auml;ltet i st&auml;llet.</p>
+  {/if}
 
   <div class="input-group">
     <div class="input-header">
@@ -342,11 +365,35 @@
 </div>
 
 <style>
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+  }
+
   .input-panel h2 {
     font-size: 1.15rem;
     font-weight: 600;
-    margin-bottom: var(--spacing-lg);
     color: var(--color-primary);
+  }
+
+  .share-btn {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    color: var(--color-primary);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    transition: border-color 0.15s ease;
+  }
+
+  .share-btn:hover {
+    border-color: var(--color-primary);
   }
 
   .input-group {

@@ -2,7 +2,7 @@
   import { formatSEK } from '../lib/formatters.js';
   import { mailtoLink } from '../lib/contact.js';
 
-  let { breakEven, direktResult, holdingResult } = $props();
+  let { breakEven, direktResult, holdingResult, shareUrl } = $props();
 
   let holdingGerMer = $derived(holdingResult.gransbelopp > direktResult.gransbelopp);
   let uttagText = $derived(
@@ -14,7 +14,7 @@
   let mejl = $derived(
     mailtoLink(
       'Hjälp med holdingbolag',
-      `Hej!\n\nEnligt K10-kalkylatorn skulle ett holdingbolag ge mig ca ${formatSEK(breakEven.netto)} netto per år ${uttagText}. Jag vill gärna ha hjälp att sätta upp det.\n\n`
+      `Hej!\n\nEnligt K10-kalkylatorn skulle ett holdingbolag ge mig ca ${formatSEK(breakEven.netto)} netto per år ${uttagText}. Jag vill gärna ha hjälp att sätta upp det.\n\nMitt scenario: ${shareUrl}\n\n`
     )
   );
 </script>

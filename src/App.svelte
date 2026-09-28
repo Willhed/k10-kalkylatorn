@@ -9,22 +9,26 @@
   import BreakEvenCard from './components/BreakEvenCard.svelte';
   import ExplainerSection from './components/ExplainerSection.svelte';
   import Footer from './components/Footer.svelte';
+  import { readState, writeState } from './lib/urlState.js';
 
-  let agarandel = $state(25);
-  let totalLonesumma = $state(2_000_000);
-  let omkostnadsbeloppDirekt = $state(100_000);
-  let omkostnadsbeloppHolding = $state(100_000);
+  // Startvärden: från delad länk om sådan finns, annars standard
+  const start = readState(window.location.search);
+
+  let agarandel = $state(start.agarandel);
+  let totalLonesumma = $state(start.totalLonesumma);
+  let omkostnadsbeloppDirekt = $state(start.omkostnadsbeloppDirekt);
+  let omkostnadsbeloppHolding = $state(start.omkostnadsbeloppHolding);
   // Holdingbolagets kostnader: årlig (bokföring, årsredovisning) och engångs (uppstart)
-  let holdingKostnad = $state(5_000);
-  let holdingStartKostnad = $state(7_500);
+  let holdingKostnad = $state(start.holdingKostnad);
+  let holdingStartKostnad = $state(start.holdingStartKostnad);
   // Valfritt: räkna på planerad årlig utdelning i stället för fullt uttag
-  let planeradUtdelningAktiv = $state(false);
-  let planeradUtdelning = $state(200_000);
+  let planeradUtdelningAktiv = $state(start.planeradUtdelningAktiv);
+  let planeradUtdelning = $state(start.planeradUtdelning);
   // Övriga fåmansbolag: array av { namn: string, andel: number (procent) }
-  let ovrigaBolag = $state([]);
+  let ovrigaBolag = $state(start.ovrigaBolag);
   let ovrigaAgarandelar = $derived(ovrigaBolag.map(b => b.andel / 100));
   // Override: bestämmande inflytande utan kapitalandel >50%
-  let dotterbolagOverride = $state(false);
+  let dotterbolagOverride = $state(start.dotterbolagOverride);
   let arDotterbolag = $derived(agarandel > 50 || dotterbolagOverride);
 
   // Beräkna minsta lön för att undvika 50×-taket
@@ -62,6 +66,32 @@
       planeradUtdelningAktiv ? planeradUtdelning : null,
     )
   );
+
+  // Delbar länk: hela scenariot i URL:en
+  let shareUrl = $derived.by(() => {
+    const query = writeState({
+      agarandel,
+      totalLonesumma,
+      omkostnadsbeloppDirekt,
+      omkostnadsbeloppHolding,
+      holdingKostnad,
+      holdingStartKostnad,
+      planeradUtdelningAktiv,
+      planeradUtdelning,
+      ovrigaBolag,
+      dotterbolagOverride,
+    });
+    const { origin, pathname } = window.location;
+    return `${origin}${pathname}${query ? `?${query}` : ''}`;
+  });
+
+  // Håll adressfältet i synk. Fördröjt, eftersom reglage uppdaterar många
+  // gånger per sekund och webbläsare begränsar antalet replaceState-anrop.
+  $effect(() => {
+    const url = shareUrl;
+    const timer = setTimeout(() => window.history.replaceState(null, '', url), 300);
+    return () => clearTimeout(timer);
+  });
 </script>
 
 <Header />
@@ -80,12 +110,13 @@
       bind:planeradUtdelning
       bind:ovrigaBolag
       bind:dotterbolagOverride
+      {shareUrl}
     />
   </div>
 
   <div class="right-col">
     <SavingsCard {direktResult} {holdingResult} />
-    <BreakEvenCard {breakEven} {direktResult} {holdingResult} />
+    <BreakEvenCard {breakEven} {direktResult} {holdingResult} {shareUrl} />
     <ComparisonChart {direktResult} {holdingResult} />
     <ResultsTable {direktResult} {holdingResult} />
   </div>
