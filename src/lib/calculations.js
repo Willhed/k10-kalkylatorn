@@ -83,17 +83,22 @@ export function beraknaGransbelopp(agarandel, totalLonesumma, egenLon, omkostnad
  * @param {number} gransDirekt - Gränsbelopp vid direkt ägande (kr)
  * @param {number} gransHolding - Gränsbelopp via holdingbolag (kr)
  * @param {number} arligKostnad - Holdingbolagets årliga merkostnad (kr)
- * @returns {object} Besparing, netto och break-even-uttag (null om det aldrig lönar sig)
+ * @param {number} startKostnad - Engångskostnad för att starta holdingbolaget (kr)
+ * @returns {object} Besparing, netto, break-even-uttag (null om det aldrig lönar sig)
+ *   och antal månader tills startkostnaden är intjänad vid fullt uttag
  */
-export function beraknaBreakEven(gransDirekt, gransHolding, arligKostnad) {
+export function beraknaBreakEven(gransDirekt, gransHolding, arligKostnad, startKostnad = 0) {
   const skatteskillnad = PROGRESSIV_SKATT_APPROX - KAPITALSKATT;
   const maxBesparing = Math.max(0, gransHolding - gransDirekt) * skatteskillnad;
   const nettoVidFulltUttag = maxBesparing - arligKostnad;
   const lonsamt = nettoVidFulltUttag > 0;
   const breakEvenUttag = lonsamt ? gransDirekt + arligKostnad / skatteskillnad : null;
+  const aterbetalningManader = lonsamt ? Math.ceil(startKostnad / (nettoVidFulltUttag / 12)) : null;
 
   return {
     arligKostnad,
+    startKostnad,
+    aterbetalningManader,
     maxBesparing,
     nettoVidFulltUttag,
     lonsamt,

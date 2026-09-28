@@ -8,6 +8,7 @@
     omkostnadsbeloppDirekt = $bindable(),
     omkostnadsbeloppHolding = $bindable(),
     holdingKostnad = $bindable(),
+    holdingStartKostnad = $bindable(),
     ovrigaBolag = $bindable(),
     dotterbolagOverride = $bindable(),
   } = $props();
@@ -254,17 +255,49 @@
       id="holding-kostnad"
       type="range"
       min="0"
-      max="50000"
-      step="1000"
-      value={Math.min(holdingKostnad, 50000)}
+      max="30000"
+      step="500"
+      value={Math.min(holdingKostnad, 30000)}
       oninput={(e) => holdingKostnad = Number(e.target.value)}
     />
     <div class="range-labels">
       <span>0 kr</span>
-      <span>25 000 kr</span>
-      <span>50 000 kr</span>
+      <span>15 000 kr</span>
+      <span>30 000 kr</span>
     </div>
     <p class="input-help">Bokf&ouml;ring, &aring;rsredovisning och bankavgifter</p>
+  </div>
+
+  <div class="input-group">
+    <div class="input-header">
+      <label for="holding-startkostnad">Uppstartskostnad f&ouml;r holdingbolaget</label>
+      <div class="input-value-wrapper">
+        <input
+          class="input-number"
+          type="text"
+          inputmode="numeric"
+          value={formatSEK(holdingStartKostnad)}
+          onfocus={handleFocus}
+          onblur={(e) => handleBlur(e, 0, Infinity, (v) => holdingStartKostnad = v, formatSEK)}
+          onkeydown={handleKeydown}
+        />
+      </div>
+    </div>
+    <input
+      id="holding-startkostnad"
+      type="range"
+      min="0"
+      max="30000"
+      step="500"
+      value={Math.min(holdingStartKostnad, 30000)}
+      oninput={(e) => holdingStartKostnad = Number(e.target.value)}
+    />
+    <div class="range-labels">
+      <span>0 kr</span>
+      <span>15 000 kr</span>
+      <span>30 000 kr</span>
+    </div>
+    <p class="input-help">Eng&aring;ngskostnad: bolagsordning, registrering och r&aring;dgivning</p>
   </div>
 </div>
 

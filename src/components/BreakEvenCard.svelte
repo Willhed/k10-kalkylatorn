@@ -35,6 +35,13 @@
       </div>
     </dl>
     {#if breakEven.lonsamt}
+      {#if breakEven.startKostnad > 0}
+        <p class="payback">
+          Uppstartskostnaden p&aring; {formatSEK(breakEven.startKostnad)} &auml;r intj&auml;nad efter
+          ca <strong>{breakEven.aterbetalningManader} {breakEven.aterbetalningManader === 1 ? 'månad' : 'månader'}</strong>
+          vid fullt uttag.
+        </p>
+      {/if}
       <p class="explanation">
         Upp till {formatSEK(direktResult.gransbelopp)} &auml;r skatten densamma i b&aring;da uppl&auml;ggen.
         D&auml;r&ouml;ver sparar holdingbolaget skatt tills dess gr&auml;nsbelopp p&aring;
@@ -107,6 +114,14 @@
 
   .negative {
     color: var(--color-danger);
+  }
+
+  .payback {
+    font-size: 0.9rem;
+    background: var(--color-success-bg);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-md);
   }
 
   .explanation {

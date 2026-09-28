@@ -14,8 +14,9 @@
   let totalLonesumma = $state(2_000_000);
   let omkostnadsbeloppDirekt = $state(100_000);
   let omkostnadsbeloppHolding = $state(100_000);
-  // Holdingbolagets årliga merkostnad: bokföring, årsredovisning, bankavgifter
-  let holdingKostnad = $state(15_000);
+  // Holdingbolagets kostnader: årlig (bokföring, årsredovisning) och engångs (uppstart)
+  let holdingKostnad = $state(5_000);
+  let holdingStartKostnad = $state(7_500);
   // Övriga fåmansbolag: array av { namn: string, andel: number (procent) }
   let ovrigaBolag = $state([]);
   let ovrigaAgarandelar = $derived(ovrigaBolag.map(b => b.andel / 100));
@@ -50,7 +51,7 @@
   );
 
   let breakEven = $derived(
-    beraknaBreakEven(direktResult.gransbelopp, holdingResult.gransbelopp, holdingKostnad)
+    beraknaBreakEven(direktResult.gransbelopp, holdingResult.gransbelopp, holdingKostnad, holdingStartKostnad)
   );
 </script>
 
@@ -65,6 +66,7 @@
       bind:omkostnadsbeloppDirekt
       bind:omkostnadsbeloppHolding
       bind:holdingKostnad
+      bind:holdingStartKostnad
       bind:ovrigaBolag
       bind:dotterbolagOverride
     />
