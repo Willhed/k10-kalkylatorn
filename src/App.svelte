@@ -3,7 +3,6 @@
   import { IBB, LONEAVDRAG_FACTOR, LONEBASERAT_PERCENTAGE, LONEBASERAT_CAP_FACTOR } from './lib/constants.js';
   import Header from './components/Header.svelte';
   import InputPanel from './components/InputPanel.svelte';
-  import ComparisonChart from './components/ComparisonChart.svelte';
   import ResultsTable from './components/ResultsTable.svelte';
   import UtrymmeCard from './components/UtrymmeCard.svelte';
   import SavingsCard from './components/SavingsCard.svelte';
@@ -141,7 +140,6 @@
       bind:planeradUtdelningAktiv
       bind:planeradUtdelning
     />
-    <ComparisonChart {direktResult} {holdingResult} />
     <ResultsTable {direktResult} {holdingResult} />
   </div>
 </div>
