@@ -11,10 +11,14 @@
   import ExplainerSection from './components/ExplainerSection.svelte';
   import Footer from './components/Footer.svelte';
   import { readState, writeState } from './lib/urlState.js';
+  import { SITE_URL } from './lib/contact.js';
   import { formatSEK } from './lib/formatters.js';
 
+  // Sidan förrenderas till HTML vid bygget (scripts/prerender.js); då finns inget window
+  const iBrowser = typeof window !== 'undefined';
+
   // Startvärden: från delad länk om sådan finns, annars standard
-  const start = readState(window.location.search);
+  const start = readState(iBrowser ? window.location.search : '');
 
   let agarandel = $state(start.agarandel);
   let totalLonesumma = $state(start.totalLonesumma);
@@ -91,7 +95,7 @@
       ovrigaBolag,
       dotterbolagOverride,
     });
-    const { origin, pathname } = window.location;
+    const { origin, pathname } = iBrowser ? window.location : new URL(SITE_URL);
     return `${origin}${pathname}${query ? `?${query}` : ''}`;
   });
 

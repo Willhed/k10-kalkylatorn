@@ -7,8 +7,11 @@ import { loadAnalytics } from './lib/analytics.js';
 
 loadAnalytics();
 
-const app = mount(App, {
-  target: document.getElementById('app'),
-});
+// #app innehåller förrenderad HTML (för sökmotorer och snabb första bild).
+// Den ersätts av den interaktiva appen; rensning och montering sker i samma
+// steg, så ingen tom sida hinner visas.
+const target = document.getElementById('app');
+target.textContent = '';
+const app = mount(App, { target });
 
 export default app;
