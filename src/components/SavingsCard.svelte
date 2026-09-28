@@ -36,7 +36,7 @@
       <p class="savings-explain">
         Den delen kan tas ut till <strong>{formatPercentDecimal(KAPITALSKATT)}</strong> skatt
         i st&auml;llet f&ouml;r ca <strong>{formatPercentDecimal(PROGRESSIV_SKATT_APPROX)}</strong>* som
-        tj&auml;nsteinkomst. Hur mycket du sparar beror p&aring; hur mycket du tar ut &mdash; se nedan.
+        tj&auml;nsteinkomst. Hur mycket du sparar beror p&aring; hur mycket du delar ut &mdash; se nedan.
       </p>
     </div>
     <p class="approx-note">

@@ -57,9 +57,9 @@
   </dl>
 
   <p class="explanation">
-    Tar du ut hela utrymmet blir skatten {formatSEK(totalt * KAPITALSKATT)}.
+    Delar du ut hela utrymmet blir skatten {formatSEK(totalt * KAPITALSKATT)}.
     Utdelning d&auml;r&ouml;ver beskattas som tj&auml;nsteinkomst, ca 50&nbsp;%.
-    Det du inte tar ut sparas till n&auml;sta &aring;r.
+    Det du inte delar ut sparas till n&auml;sta &aring;r.
   </p>
 </div>
 

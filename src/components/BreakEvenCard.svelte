@@ -75,13 +75,13 @@
 
   <p class="verdict">
     {#if breakEven.lonsamt && breakEven.planerad}
-      Ja. Holdingbolaget l&ouml;nar sig vid uttag &ouml;ver {formatSEK(breakEven.breakEvenUttag)} per &aring;r,
-      och du planerar {formatSEK(breakEven.uttag)}.
+      Ja. Holdingbolaget l&ouml;nar sig vid utdelning &ouml;ver {formatSEK(breakEven.breakEvenUttag)} per &aring;r,
+      och du planerar att dela ut {formatSEK(breakEven.uttag)}.
     {:else if breakEven.lonsamt}
-      Ja, om du tar ut mer &auml;n {formatSEK(breakEven.breakEvenUttag)} per &aring;r.
+      Ja, om du delar ut mer &auml;n {formatSEK(breakEven.breakEvenUttag)} per &aring;r.
     {:else if breakEven.breakEvenUttag !== null}
-      Inte med {formatSEK(breakEven.uttag)} per &aring;r. Holdingbolaget l&ouml;nar sig f&ouml;rst
-      vid uttag &ouml;ver {formatSEK(breakEven.breakEvenUttag)}.
+      Inte med {formatSEK(breakEven.uttag)} i utdelning per &aring;r. Holdingbolaget l&ouml;nar sig f&ouml;rst
+      vid utdelning &ouml;ver {formatSEK(breakEven.breakEvenUttag)}.
     {:else}
       Nej, inte p&aring; grund av utdelningsutrymmet.
     {/if}
