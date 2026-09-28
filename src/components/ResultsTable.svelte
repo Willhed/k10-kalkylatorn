@@ -13,7 +13,8 @@
     <h2>Detaljerad ber&auml;kning</h2>
     <span class="summary-hint">Komponent f&ouml;r komponent, direkt &auml;gande mot holdingbolag</span>
   </summary>
-  <div class="table-wrapper">
+  <!-- Tabellen kan scrolla i sidled på mobil; tabindex gör den nåbar med tangentbord -->
+  <div class="table-wrapper" tabindex="0" role="region" aria-label="Detaljerad beräkning">
     <table>
       <thead>
         <tr>
@@ -203,6 +204,12 @@
     overflow-x: auto;
   }
 
+  .table-wrapper:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
@@ -220,8 +227,8 @@
     color: var(--color-text-muted);
   }
 
-  th.direkt { color: #3b82f6; }
-  th.holding { color: #10b981; }
+  th.direkt { color: var(--color-primary-light); }
+  th.holding { color: var(--color-success); }
 
   td {
     padding: var(--spacing-sm) var(--spacing-md);

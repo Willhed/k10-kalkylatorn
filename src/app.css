@@ -1,16 +1,17 @@
 :root {
   --color-primary: #1e40af;
-  --color-primary-light: #3b82f6;
+  /* Text- och beloppsfärger valda för minst 4,5:1 i kontrast mot sidans bakgrunder (WCAG AA) */
+  --color-primary-light: #2563eb;
   --color-primary-bg: #eff6ff;
   --color-accent: #f59e0b;
   --color-accent-light: #fef3c7;
-  --color-success: #10b981;
+  --color-success: #047857;
   --color-success-bg: #ecfdf5;
-  --color-danger: #ef4444;
+  --color-danger: #b91c1c;
   --color-bg: #f1f5f9;
   --color-surface: #ffffff;
   --color-text: #1e293b;
-  --color-text-muted: #64748b;
+  --color-text-muted: #556377;
   --color-border: #e2e8f0;
 
   --max-width: 1300px;

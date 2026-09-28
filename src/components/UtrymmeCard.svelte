@@ -34,10 +34,10 @@
       </dt>
       <dd>{formatSEK(direktResult.lonebaseratUtrymme)}</dd>
       {#if direktResult.lonebaseratUtrymme > 0}
-        <p class="row-note">
+        <dd class="row-note">
           F&ouml;ruts&auml;tter att du tar ut minst {formatSEK(egenLon)} i l&ouml;n,
           annars begr&auml;nsas det av 50&times;-taket.
-        </p>
+        </dd>
       {/if}
     </div>
     <div class="row">
@@ -125,7 +125,11 @@
     white-space: nowrap;
   }
 
-  .row-note {
+  /* En andra beskrivning till beloppet: full bredd och vanlig radbrytning */
+  .row dd.row-note {
+    margin-left: 0;
+    white-space: normal;
+    font-variant-numeric: normal;
     flex-basis: 100%;
     font-size: 0.78rem;
     color: var(--color-text-muted);

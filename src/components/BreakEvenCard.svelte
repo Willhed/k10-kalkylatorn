@@ -49,6 +49,7 @@
           class="input-number"
           type="text"
           inputmode="numeric"
+          aria-label="Planerad utdelning per år"
           value={formatSEK(planeradUtdelning)}
           onfocus={handleFocus}
           onblur={(e) => handleBlur(e, 0, Infinity, (v) => planeradUtdelning = v, formatSEK)}

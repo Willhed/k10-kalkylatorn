@@ -110,52 +110,54 @@
 
 <Header />
 
-<div class="app-layout">
-  <div class="left-col">
-    <InputPanel
-      bind:agarandel
-      bind:totalLonesumma
-      bind:omkostnadsbeloppDirekt
-      bind:sparatUtrymme
-      bind:omkostnadsbeloppHolding
-      bind:holdingKostnad
-      bind:holdingStartKostnad
-      bind:ovrigaBolag
-      bind:dotterbolagOverride
-      {shareUrl}
-    />
+<main>
+  <div class="app-layout">
+    <div class="left-col">
+      <InputPanel
+        bind:agarandel
+        bind:totalLonesumma
+        bind:omkostnadsbeloppDirekt
+        bind:sparatUtrymme
+        bind:omkostnadsbeloppHolding
+        bind:holdingKostnad
+        bind:holdingStartKostnad
+        bind:ovrigaBolag
+        bind:dotterbolagOverride
+        {shareUrl}
+      />
+    </div>
+
+    <div class="right-col" bind:this={resultatKolumn}>
+      <UtrymmeCard {direktResult} {sparatUtrymme} {egenLon} {utrymme} />
+
+      <section class="step-two">
+        <h2><span class="step">Steg 2</span> Skulle ett holdingbolag l&ouml;na sig?</h2>
+        <p class="step-intro">
+          J&auml;mf&ouml;relsen g&auml;ller utrymmet du f&aring;r varje &aring;r fram&ouml;ver,
+          med dina v&auml;rden under <em>Holdingbolag</em> i panelen.
+          {#if sparatUtrymme > 0}
+            Ditt sparade utdelningsutrymme p&aring; {formatSEK(sparatUtrymme)} ing&aring;r inte:
+            det f&ouml;ljer med aktierna och kan anv&auml;ndas n&auml;r du s&auml;ljer in dem i
+            holdingbolaget, s&aring; att den delen av k&ouml;peskillingen beskattas med 20&nbsp;%.
+          {/if}
+        </p>
+      </section>
+
+      <SavingsCard {direktResult} {holdingResult} />
+      <BreakEvenCard
+        {breakEven}
+        {direktResult}
+        {holdingResult}
+        {shareUrl}
+        bind:planeradUtdelningAktiv
+        bind:planeradUtdelning
+      />
+      <ResultsTable {direktResult} {holdingResult} />
+    </div>
   </div>
 
-  <div class="right-col" bind:this={resultatKolumn}>
-    <UtrymmeCard {direktResult} {sparatUtrymme} {egenLon} {utrymme} />
-
-    <section class="step-two">
-      <h2><span class="step">Steg 2</span> Skulle ett holdingbolag l&ouml;na sig?</h2>
-      <p class="step-intro">
-        J&auml;mf&ouml;relsen g&auml;ller utrymmet du f&aring;r varje &aring;r fram&ouml;ver,
-        med dina v&auml;rden under <em>Holdingbolag</em> i panelen.
-        {#if sparatUtrymme > 0}
-          Ditt sparade utdelningsutrymme p&aring; {formatSEK(sparatUtrymme)} ing&aring;r inte:
-          det f&ouml;ljer med aktierna och kan anv&auml;ndas n&auml;r du s&auml;ljer in dem i
-          holdingbolaget, s&aring; att den delen av k&ouml;peskillingen beskattas med 20&nbsp;%.
-        {/if}
-      </p>
-    </section>
-
-    <SavingsCard {direktResult} {holdingResult} />
-    <BreakEvenCard
-      {breakEven}
-      {direktResult}
-      {holdingResult}
-      {shareUrl}
-      bind:planeradUtdelningAktiv
-      bind:planeradUtdelning
-    />
-    <ResultsTable {direktResult} {holdingResult} />
-  </div>
-</div>
-
-<ExplainerSection />
+  <ExplainerSection />
+</main>
 
 <Footer />
 
