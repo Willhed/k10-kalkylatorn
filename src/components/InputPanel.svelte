@@ -1,11 +1,11 @@
 <script>
   import { formatSEK, formatPercent } from '../lib/formatters.js';
-  import { clamp, parseNumber, roundTo, handleBlur, handleFocus, handleKeydown } from '../lib/numberInput.js';
+  import { clamp, parseNumber, roundTo, handleFocus, handleKeydown } from '../lib/numberInput.js';
+  import NumberField from './NumberField.svelte';
 
   let {
     agarandel = $bindable(),
     totalLonesumma = $bindable(),
-    egenLon,
     omkostnadsbeloppDirekt = $bindable(),
     sparatUtrymme = $bindable(),
     omkostnadsbeloppHolding = $bindable(),
@@ -15,6 +15,9 @@
     dotterbolagOverride = $bindable(),
     shareUrl,
   } = $props();
+
+  // Förklaringar för fält som inte är sifferfält; sifferfälten hanterar sina egna
+  let hjalp = $state({ ovriga: false, dotter: false });
 
   let kopierad = $state(false);
   let kopieringsfel = $state(false);
@@ -29,7 +32,6 @@
       kopieringsfel = true;
     }
   }
-
 </script>
 
 <div class="card input-panel">
@@ -45,294 +47,151 @@
 
   <h3 class="section-label">1 &middot; Ditt bolag</h3>
 
-  <div class="input-group">
-    <div class="input-header">
-      <label for="agarandel">Andel i operativbolaget</label>
-      <div class="input-value-wrapper">
-        <input
-          class="input-number"
-          type="text"
-          inputmode="numeric"
-          value={formatPercent(agarandel)}
-          onfocus={handleFocus}
-          onblur={(e) => handleBlur(e, 1, 100, (v) => agarandel = v, formatPercent, 2)}
-          onkeydown={handleKeydown}
-        />
-      </div>
-    </div>
-    <input
-      id="agarandel"
-      type="range"
-      min="1"
-      max="100"
-      step="0.05"
-      bind:value={agarandel}
-    />
-    <div class="range-labels">
-      <span>1 %</span>
-      <span>50 %</span>
-      <span>100 %</span>
-    </div>
-    <p class="input-help">Din andel av aktierna i bolaget</p>
-  </div>
+  <NumberField
+    id="agarandel"
+    label="Andel i operativbolaget"
+    bind:value={agarandel}
+    min={1}
+    max={100}
+    sliderMax={100}
+    step={0.05}
+    format={formatPercent}
+    decimals={2}
+    help="Din andel av aktierna i bolaget."
+  />
 
-  <div class="input-group">
-    <div class="input-header">
-      <label for="lonesumma">Total l&ouml;nesumma i bolaget</label>
-      <div class="input-value-wrapper">
-        <input
-          class="input-number"
-          type="text"
-          inputmode="numeric"
-          value={formatSEK(totalLonesumma)}
-          onfocus={handleFocus}
-          onblur={(e) => handleBlur(e, 0, Infinity, (v) => totalLonesumma = v, formatSEK)}
-          onkeydown={handleKeydown}
-        />
-      </div>
-    </div>
-    <input
-      id="lonesumma"
-      type="range"
-      min="0"
-      max="15000000"
-      step="50000"
-      value={Math.min(totalLonesumma, 15000000)}
-      oninput={(e) => totalLonesumma = Number(e.target.value)}
-    />
-    <div class="range-labels">
-      <span>0 kr</span>
-      <span>7,5 Mkr</span>
-      <span>15 Mkr</span>
-    </div>
-    <p class="input-help">Alla anst&auml;lldas l&ouml;ner inkl. &auml;garens</p>
-  </div>
+  <NumberField
+    id="lonesumma"
+    label="Total lönesumma i bolaget"
+    bind:value={totalLonesumma}
+    sliderMax={15_000_000}
+    step={50_000}
+    help="Alla anställdas kontanta bruttolöner under föregående år, inklusive dina egna."
+  />
 
-  <div class="input-group computed-group">
-    <div class="input-header">
-      <label>&Auml;garens l&ouml;n (ber&auml;knad)</label>
-      <span class="computed-value">{formatSEK(egenLon)}</span>
-    </div>
-    <p class="input-help">Minsta l&ouml;n f&ouml;r att inte begr&auml;nsas av 50&times;-taket</p>
-  </div>
+  <NumberField
+    id="omkostnad-direkt"
+    label="Omkostnadsbelopp"
+    bind:value={omkostnadsbeloppDirekt}
+    sliderMax={5_000_000}
+    step={25_000}
+    help="Vad du betalade för aktierna i bolaget, t.ex. aktiekapitalet vid start."
+  />
 
-  <div class="input-group">
-    <div class="input-header">
-      <label for="omkostnad-direkt">Omkostnadsbelopp &mdash; operativbolaget</label>
-      <div class="input-value-wrapper">
-        <input
-          class="input-number"
-          type="text"
-          inputmode="numeric"
-          value={formatSEK(omkostnadsbeloppDirekt)}
-          onfocus={handleFocus}
-          onblur={(e) => handleBlur(e, 0, Infinity, (v) => omkostnadsbeloppDirekt = v, formatSEK)}
-          onkeydown={handleKeydown}
-        />
-      </div>
-    </div>
-    <input
-      id="omkostnad-direkt"
-      type="range"
-      min="0"
-      max="5000000"
-      step="25000"
-      value={Math.min(omkostnadsbeloppDirekt, 5000000)}
-      oninput={(e) => omkostnadsbeloppDirekt = Number(e.target.value)}
-    />
-    <div class="range-labels">
-      <span>0 kr</span>
-      <span>2,5 Mkr</span>
-      <span>5 Mkr</span>
-    </div>
-    <p class="input-help">Anskaffningsv&auml;rde f&ouml;r aktier i operativbolaget</p>
-  </div>
-
-  <div class="input-group">
-    <div class="input-header">
-      <label for="sparat-utrymme">Sparat utdelningsutrymme</label>
-      <div class="input-value-wrapper">
-        <input
-          class="input-number"
-          type="text"
-          inputmode="numeric"
-          value={formatSEK(sparatUtrymme)}
-          onfocus={handleFocus}
-          onblur={(e) => handleBlur(e, 0, Infinity, (v) => sparatUtrymme = v, formatSEK)}
-          onkeydown={handleKeydown}
-        />
-      </div>
-    </div>
-    <input
-      id="sparat-utrymme"
-      type="range"
-      min="0"
-      max="3000000"
-      step="10000"
-      value={Math.min(sparatUtrymme, 3000000)}
-      oninput={(e) => sparatUtrymme = Number(e.target.value)}
-    />
-    <div class="range-labels">
-      <span>0 kr</span>
-      <span>1,5 Mkr</span>
-      <span>3 Mkr</span>
-    </div>
-    <p class="input-help">Outnyttjat utrymme fr&aring;n tidigare &aring;r (finns p&aring; f&ouml;rra &aring;rets K10)</p>
-  </div>
+  <NumberField
+    id="sparat-utrymme"
+    label="Sparat utdelningsutrymme"
+    bind:value={sparatUtrymme}
+    sliderMax={3_000_000}
+    step={10_000}
+    help="Outnyttjat utdelningsutrymme från tidigare år. Finns på förra årets K10."
+  />
 
   <div class="input-group ovriga-group">
-    <div class="input-header">
-      <label>&#214;vriga f&#229;mansbolag du &#228;ger</label>
+    <div class="group-label">
+      <span class="label-text">&Ouml;vriga f&aring;mansbolag du &auml;ger</span>
+      <button
+        type="button"
+        class="help-btn"
+        aria-expanded={hjalp.ovriga}
+        aria-controls="ovriga-hjalp"
+        aria-label="Förklaring: övriga fåmansbolag"
+        onclick={() => (hjalp.ovriga = !hjalp.ovriga)}
+      >?</button>
     </div>
-    <p class="input-help">
-      Grundbeloppet (4 &times; IBB) &#228;r gemensamt f&#246;r alla dina f&#229;mansbolag.
-      &#196;ger du andelar i fler bolag s&#229; proportioneras det.
-    </p>
+    {#if hjalp.ovriga}
+      <p id="ovriga-hjalp" class="input-help">
+        Grundbeloppet (4 &times; IBB) &auml;r gemensamt f&ouml;r alla dina f&aring;mansbolag.
+        &Auml;ger du andelar i fler bolag delas det mellan dem.
+      </p>
+    {/if}
     {#each ovrigaBolag as bolag, i}
       <div class="ovriga-row">
         <input
           class="ovriga-namn"
           type="text"
           placeholder="Bolag {i + 1}"
+          aria-label="Namn på bolag {i + 1}"
           bind:value={ovrigaBolag[i].namn}
           onkeydown={handleKeydown}
         />
-        <div class="input-value-wrapper">
-          <input
-            class="input-number"
-            type="text"
-            inputmode="numeric"
-            value={formatPercent(bolag.andel)}
-            onfocus={handleFocus}
-            onblur={(e) => {
-              const val = parseNumber(e.target.value);
-              if (!isNaN(val)) {
-                ovrigaBolag[i].andel = clamp(roundTo(val, 2), 1, 100);
-                e.target.value = formatPercent(ovrigaBolag[i].andel);
-              }
-            }}
-            onkeydown={handleKeydown}
-          />
-        </div>
+        <input
+          class="input-number"
+          type="text"
+          inputmode="numeric"
+          aria-label="Ägarandel i {bolag.namn || 'bolag ' + (i + 1)}"
+          value={formatPercent(bolag.andel)}
+          onfocus={handleFocus}
+          onblur={(e) => {
+            const val = parseNumber(e.target.value);
+            if (!isNaN(val)) {
+              ovrigaBolag[i].andel = clamp(roundTo(val, 2), 1, 100);
+              e.target.value = formatPercent(ovrigaBolag[i].andel);
+            }
+          }}
+          onkeydown={handleKeydown}
+        />
         <button class="remove-btn" onclick={() => ovrigaBolag.splice(i, 1)} aria-label="Ta bort {bolag.namn || 'Bolag ' + (i + 1)}">&times;</button>
       </div>
     {/each}
-    <button class="add-btn" onclick={() => ovrigaBolag.push({ namn: '', andel: 100 })}>+ L&#228;gg till bolag</button>
+    <button class="add-btn" onclick={() => ovrigaBolag.push({ namn: '', andel: 100 })}>+ L&auml;gg till bolag</button>
   </div>
 
   <h3 class="section-label">2 &middot; Holdingbolag</h3>
-  <p class="section-help">
-    Holdingbolaget antas &auml;gas till 100&nbsp;% av dig och &auml;ga din andel av bolaget ovan.
-    &Ouml;ver 50&nbsp;% r&auml;knas bolagets l&ouml;ner med i holdingbolagets l&ouml;neunderlag.
-  </p>
+  <p class="section-help">Antas &auml;gas till 100&nbsp;% av dig och &auml;ga din andel av bolaget ovan.</p>
+
   {#if agarandel <= 50}
     <div class="input-group">
-      <label class="checkbox-row first">
-        <input type="checkbox" bind:checked={dotterbolagOverride} />
-        <span>Best&auml;mmande inflytande (dotterbolag enligt &Aring;RL 1:4)</span>
-      </label>
-      <p class="input-help">
-        Kryssa i om holdingbolaget har best&auml;mmande inflytande via t.ex.
-        r&ouml;stmajoritet, styrelsemajoritet eller avtal &mdash; trots kapitalandel under 50 %.
-      </p>
+      <div class="group-label">
+        <label class="checkbox-row">
+          <input type="checkbox" bind:checked={dotterbolagOverride} />
+          <span>Best&auml;mmande inflytande</span>
+        </label>
+        <button
+          type="button"
+          class="help-btn"
+          aria-expanded={hjalp.dotter}
+          aria-controls="dotter-hjalp"
+          aria-label="Förklaring: bestämmande inflytande"
+          onclick={() => (hjalp.dotter = !hjalp.dotter)}
+        >?</button>
+      </div>
+      {#if hjalp.dotter}
+        <p id="dotter-hjalp" class="input-help">
+          Kryssa i om holdingbolaget har best&auml;mmande inflytande (&Aring;RL 1:4) via t.ex.
+          r&ouml;stmajoritet, styrelsemajoritet eller avtal &mdash; trots kapitalandel under 50&nbsp;%.
+          D&aring; r&auml;knas bolagets l&ouml;ner med i holdingbolagets l&ouml;neunderlag.
+        </p>
+      {/if}
     </div>
   {/if}
 
-  <div class="input-group">
-    <div class="input-header">
-      <label for="omkostnad-holding">Omkostnadsbelopp &mdash; holdingbolag</label>
-      <div class="input-value-wrapper">
-        <input
-          class="input-number"
-          type="text"
-          inputmode="numeric"
-          value={formatSEK(omkostnadsbeloppHolding)}
-          onfocus={handleFocus}
-          onblur={(e) => handleBlur(e, 0, Infinity, (v) => omkostnadsbeloppHolding = v, formatSEK)}
-          onkeydown={handleKeydown}
-        />
-      </div>
-    </div>
-    <input
-      id="omkostnad-holding"
-      type="range"
-      min="0"
-      max="5000000"
-      step="25000"
-      value={Math.min(omkostnadsbeloppHolding, 5000000)}
-      oninput={(e) => omkostnadsbeloppHolding = Number(e.target.value)}
-    />
-    <div class="range-labels">
-      <span>0 kr</span>
-      <span>2,5 Mkr</span>
-      <span>5 Mkr</span>
-    </div>
-    <p class="input-help">Anskaffningsv&auml;rde f&ouml;r aktier i holdingbolaget</p>
-  </div>
+  <NumberField
+    id="omkostnad-holding"
+    label="Omkostnadsbelopp"
+    bind:value={omkostnadsbeloppHolding}
+    sliderMax={5_000_000}
+    step={25_000}
+    help="Vad du betalar för aktierna i holdingbolaget, t.ex. aktiekapitalet."
+  />
 
-  <div class="input-group">
-    <div class="input-header">
-      <label for="holding-kostnad">&Aring;rlig kostnad f&ouml;r holdingbolaget</label>
-      <div class="input-value-wrapper">
-        <input
-          class="input-number"
-          type="text"
-          inputmode="numeric"
-          value={formatSEK(holdingKostnad)}
-          onfocus={handleFocus}
-          onblur={(e) => handleBlur(e, 0, Infinity, (v) => holdingKostnad = v, formatSEK)}
-          onkeydown={handleKeydown}
-        />
-      </div>
-    </div>
-    <input
-      id="holding-kostnad"
-      type="range"
-      min="0"
-      max="30000"
-      step="500"
-      value={Math.min(holdingKostnad, 30000)}
-      oninput={(e) => holdingKostnad = Number(e.target.value)}
-    />
-    <div class="range-labels">
-      <span>0 kr</span>
-      <span>15 000 kr</span>
-      <span>30 000 kr</span>
-    </div>
-    <p class="input-help">Bokf&ouml;ring, &aring;rsredovisning och bankavgifter</p>
-  </div>
+  <NumberField
+    id="holding-kostnad"
+    label="Årlig kostnad"
+    bind:value={holdingKostnad}
+    sliderMax={30_000}
+    step={500}
+    help="Bokföring, årsredovisning och bankavgifter för holdingbolaget."
+  />
 
-  <div class="input-group">
-    <div class="input-header">
-      <label for="holding-startkostnad">Uppstartskostnad f&ouml;r holdingbolaget</label>
-      <div class="input-value-wrapper">
-        <input
-          class="input-number"
-          type="text"
-          inputmode="numeric"
-          value={formatSEK(holdingStartKostnad)}
-          onfocus={handleFocus}
-          onblur={(e) => handleBlur(e, 0, Infinity, (v) => holdingStartKostnad = v, formatSEK)}
-          onkeydown={handleKeydown}
-        />
-      </div>
-    </div>
-    <input
-      id="holding-startkostnad"
-      type="range"
-      min="0"
-      max="30000"
-      step="500"
-      value={Math.min(holdingStartKostnad, 30000)}
-      oninput={(e) => holdingStartKostnad = Number(e.target.value)}
-    />
-    <div class="range-labels">
-      <span>0 kr</span>
-      <span>15 000 kr</span>
-      <span>30 000 kr</span>
-    </div>
-    <p class="input-help">Eng&aring;ngskostnad: bolagsordning, registrering och r&aring;dgivning</p>
-  </div>
+  <NumberField
+    id="holding-startkostnad"
+    label="Uppstartskostnad"
+    bind:value={holdingStartKostnad}
+    sliderMax={30_000}
+    step={500}
+    help="Engångskostnad för att starta holdingbolaget: bolagsordning, registrering och rådgivning."
+  />
 </div>
 
 <style>
@@ -351,10 +210,6 @@
     font-size: 0.8rem;
     color: var(--color-text-muted);
     margin: calc(-1 * var(--spacing-sm)) 0 var(--spacing-lg);
-  }
-
-  .checkbox-row.first {
-    margin-top: 0;
   }
 
   .panel-header {
@@ -389,36 +244,26 @@
   }
 
   .input-group {
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
   }
 
-  .input-group:last-child {
-    margin-bottom: 0;
-  }
-
-  .input-header {
+  .group-label {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-sm);
+    align-items: center;
+    gap: var(--spacing-xs);
   }
 
-  .input-header > label {
-    /* Etiketten krymper och radbryts först; fältet flyttas ner först när etiketten inte ryms */
-    flex: 1 1 8rem;
+  .group-label .checkbox-row {
+    margin-top: 0;
   }
 
-  label {
+  .label-text {
     font-weight: 500;
     font-size: 0.95rem;
   }
 
-  .input-value-wrapper {
-    flex-shrink: 0;
-    /* Håll fältet högerställt även när det bryts ner på egen rad */
-    margin-left: auto;
+  .input-group:last-child {
+    margin-bottom: 0;
   }
 
   .input-help {
@@ -426,20 +271,6 @@
     color: var(--color-text-muted);
     margin-top: var(--spacing-xs);
     font-style: italic;
-  }
-
-  .computed-group {
-    background: var(--color-surface);
-    border: 1px dashed var(--color-border);
-    border-radius: 8px;
-    padding: var(--spacing-sm) var(--spacing-md);
-  }
-
-  .computed-value {
-    font-weight: 700;
-    font-size: 1.05rem;
-    color: var(--color-primary);
-    font-variant-numeric: tabular-nums;
   }
 
   .ovriga-group {
@@ -454,6 +285,11 @@
     align-items: center;
     gap: var(--spacing-sm);
     margin-top: var(--spacing-sm);
+  }
+
+  /* "100 %" behöver mindre plats än beloppsfälten; resten går till bolagsnamnet */
+  .ovriga-row .input-number {
+    width: 5em;
   }
 
   .ovriga-namn {

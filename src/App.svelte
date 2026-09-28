@@ -105,7 +105,6 @@
     <InputPanel
       bind:agarandel
       bind:totalLonesumma
-      {egenLon}
       bind:omkostnadsbeloppDirekt
       bind:sparatUtrymme
       bind:omkostnadsbeloppHolding
@@ -118,7 +117,7 @@
   </div>
 
   <div class="right-col">
-    <UtrymmeCard {direktResult} {sparatUtrymme} />
+    <UtrymmeCard {direktResult} {sparatUtrymme} {egenLon} />
 
     <section class="step-two">
       <h2><span class="step">Steg 2</span> Skulle ett holdingbolag l&ouml;na sig?</h2>

@@ -2,7 +2,7 @@
   import { formatSEK } from '../lib/formatters.js';
   import { IBB_AR, KAPITALSKATT } from '../lib/constants.js';
 
-  let { direktResult, sparatUtrymme } = $props();
+  let { direktResult, sparatUtrymme, egenLon } = $props();
 
   // Gränsbeloppet beräknas på föregående års IBB, så det gäller utdelning året efter
   const utdelningsar = IBB_AR + 1;
@@ -37,6 +37,12 @@
         {/if}
       </dt>
       <dd>{formatSEK(direktResult.lonebaseratUtrymme)}</dd>
+      {#if direktResult.lonebaseratUtrymme > 0}
+        <p class="row-note">
+          F&ouml;ruts&auml;tter att du tar ut minst {formatSEK(egenLon)} i l&ouml;n,
+          annars begr&auml;nsas det av 50&times;-taket.
+        </p>
+      {/if}
     </div>
     <div class="row">
       <dt>R&auml;nta p&aring; omkostnadsbelopp</dt>
@@ -121,6 +127,13 @@
     margin-left: auto;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+  }
+
+  .row-note {
+    flex-basis: 100%;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    margin-top: calc(-1 * var(--spacing-xs));
   }
 
   .row.total {
