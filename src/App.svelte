@@ -5,11 +5,13 @@
   import InputPanel from './components/InputPanel.svelte';
   import ComparisonChart from './components/ComparisonChart.svelte';
   import ResultsTable from './components/ResultsTable.svelte';
+  import UtrymmeCard from './components/UtrymmeCard.svelte';
   import SavingsCard from './components/SavingsCard.svelte';
   import BreakEvenCard from './components/BreakEvenCard.svelte';
   import ExplainerSection from './components/ExplainerSection.svelte';
   import Footer from './components/Footer.svelte';
   import { readState, writeState } from './lib/urlState.js';
+  import { formatSEK } from './lib/formatters.js';
 
   // Startvärden: från delad länk om sådan finns, annars standard
   const start = readState(window.location.search);
@@ -17,6 +19,7 @@
   let agarandel = $state(start.agarandel);
   let totalLonesumma = $state(start.totalLonesumma);
   let omkostnadsbeloppDirekt = $state(start.omkostnadsbeloppDirekt);
+  let sparatUtrymme = $state(start.sparatUtrymme);
   let omkostnadsbeloppHolding = $state(start.omkostnadsbeloppHolding);
   // Holdingbolagets kostnader: årlig (bokföring, årsredovisning) och engångs (uppstart)
   let holdingKostnad = $state(start.holdingKostnad);
@@ -73,6 +76,7 @@
       agarandel,
       totalLonesumma,
       omkostnadsbeloppDirekt,
+      sparatUtrymme,
       omkostnadsbeloppHolding,
       holdingKostnad,
       holdingStartKostnad,
@@ -103,6 +107,7 @@
       bind:totalLonesumma
       {egenLon}
       bind:omkostnadsbeloppDirekt
+      bind:sparatUtrymme
       bind:omkostnadsbeloppHolding
       bind:holdingKostnad
       bind:holdingStartKostnad
@@ -115,6 +120,21 @@
   </div>
 
   <div class="right-col">
+    <UtrymmeCard {direktResult} {sparatUtrymme} />
+
+    <section class="step-two">
+      <h2><span class="step">Steg 2</span> Skulle ett holdingbolag l&ouml;na sig?</h2>
+      <p class="step-intro">
+        J&auml;mf&ouml;relsen g&auml;ller utrymmet du f&aring;r varje &aring;r fram&ouml;ver,
+        med dina v&auml;rden under <em>Holdingbolag</em> i panelen.
+        {#if sparatUtrymme > 0}
+          Ditt sparade utdelningsutrymme p&aring; {formatSEK(sparatUtrymme)} ing&aring;r inte:
+          det f&ouml;ljer med aktierna och kan anv&auml;ndas n&auml;r du s&auml;ljer in dem i
+          holdingbolaget, s&aring; att den delen av k&ouml;peskillingen beskattas med 20&nbsp;%.
+        {/if}
+      </p>
+    </section>
+
     <SavingsCard {direktResult} {holdingResult} />
     <BreakEvenCard {breakEven} {direktResult} {holdingResult} {shareUrl} />
     <ComparisonChart {direktResult} {holdingResult} />
@@ -137,19 +157,56 @@
   .left-col {
     position: sticky;
     top: var(--spacing-lg);
+    /* Panelen är högre än skärmen: scrolla inuti den i stället för att dölja nedre delen */
+    max-height: calc(100vh - 2 * var(--spacing-lg));
+    overflow-y: auto;
+    border-radius: var(--border-radius);
   }
 
   .right-col {
     min-width: 0;
   }
 
+  .step-two {
+    margin: var(--spacing-2xl) 0 var(--spacing-md);
+  }
+
+  .step-two h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .step-two .step {
+    display: inline-block;
+    background: var(--color-primary);
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-right: var(--spacing-xs);
+    vertical-align: middle;
+  }
+
+  .step-intro {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
   @media (max-width: 900px) {
     .app-layout {
-      grid-template-columns: 1fr;
+      /* minmax(0, …) så att innehåll inte kan göra kolumnen bredare än skärmen */
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .left-col {
       position: static;
+      max-height: none;
+      overflow-y: visible;
     }
   }
 </style>

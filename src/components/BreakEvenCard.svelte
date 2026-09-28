@@ -127,6 +127,7 @@
 
   .row {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     gap: var(--spacing-md);
     padding: var(--spacing-xs) 0;
@@ -134,6 +135,7 @@
   }
 
   .row dd {
+    margin-left: auto;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }

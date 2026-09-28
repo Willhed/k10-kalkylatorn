@@ -6,7 +6,7 @@
 
 <header class="header">
   <h1>K10-kalkylatorn</h1>
-  <p class="subtitle">Nya 3:12-reglerna 2026 &mdash; J&auml;mf&ouml;r direkt &auml;gande vs holdingbolag</p>
+  <p class="subtitle">R&auml;kna ut ditt utdelningsutrymme enligt nya 3:12-reglerna &mdash; och se om ett holdingbolag l&ouml;nar sig</p>
   <span class="badge">IBB {IBB_AR}: {formatSEK(IBB)}</span>
   <div class="cta-row">
     <span class="cta-label">Vill du ha personlig r&aring;dgivning?</span>

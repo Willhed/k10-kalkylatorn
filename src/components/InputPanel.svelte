@@ -6,6 +6,7 @@
     totalLonesumma = $bindable(),
     egenLon,
     omkostnadsbeloppDirekt = $bindable(),
+    sparatUtrymme = $bindable(),
     omkostnadsbeloppHolding = $bindable(),
     holdingKostnad = $bindable(),
     holdingStartKostnad = $bindable(),
@@ -76,6 +77,8 @@
     <p class="input-help">Kunde inte kopiera. Kopiera l&auml;nken fr&aring;n adressf&auml;ltet i st&auml;llet.</p>
   {/if}
 
+  <h3 class="section-label">1 &middot; Ditt bolag</h3>
+
   <div class="input-group">
     <div class="input-header">
       <label for="agarandel">Andel i operativbolaget</label>
@@ -104,17 +107,7 @@
       <span>50 %</span>
       <span>100 %</span>
     </div>
-    <p class="input-help">Direkt: din andel. Holding: holdingbolagets andel (&ouml;ver 50 % ger l&ouml;neunderlag)</p>
-    {#if agarandel <= 50}
-      <label class="checkbox-row">
-        <input type="checkbox" bind:checked={dotterbolagOverride} />
-        <span>Best&auml;mmande inflytande (dotterbolag enligt &Aring;RL 1:4)</span>
-      </label>
-      <p class="input-help">
-        Kryssa i om holdingbolaget har best&auml;mmande inflytande via t.ex.
-        r&ouml;stmajoritet, styrelsemajoritet eller avtal &mdash; trots kapitalandel under 50 %.
-      </p>
-    {/if}
+    <p class="input-help">Din andel av aktierna i bolaget</p>
   </div>
 
   <div class="input-group">
@@ -189,6 +182,38 @@
     <p class="input-help">Anskaffningsv&auml;rde f&ouml;r aktier i operativbolaget</p>
   </div>
 
+  <div class="input-group">
+    <div class="input-header">
+      <label for="sparat-utrymme">Sparat utdelningsutrymme</label>
+      <div class="input-value-wrapper">
+        <input
+          class="input-number"
+          type="text"
+          inputmode="numeric"
+          value={formatSEK(sparatUtrymme)}
+          onfocus={handleFocus}
+          onblur={(e) => handleBlur(e, 0, Infinity, (v) => sparatUtrymme = v, formatSEK)}
+          onkeydown={handleKeydown}
+        />
+      </div>
+    </div>
+    <input
+      id="sparat-utrymme"
+      type="range"
+      min="0"
+      max="3000000"
+      step="10000"
+      value={Math.min(sparatUtrymme, 3000000)}
+      oninput={(e) => sparatUtrymme = Number(e.target.value)}
+    />
+    <div class="range-labels">
+      <span>0 kr</span>
+      <span>1,5 Mkr</span>
+      <span>3 Mkr</span>
+    </div>
+    <p class="input-help">Outnyttjat utrymme fr&aring;n tidigare &aring;r (finns p&aring; f&ouml;rra &aring;rets K10)</p>
+  </div>
+
   <div class="input-group ovriga-group">
     <div class="input-header">
       <label>&#214;vriga f&#229;mansbolag du &#228;ger</label>
@@ -228,6 +253,24 @@
     {/each}
     <button class="add-btn" onclick={() => ovrigaBolag.push({ namn: '', andel: 100 })}>+ L&#228;gg till bolag</button>
   </div>
+
+  <h3 class="section-label">2 &middot; Holdingbolag</h3>
+  <p class="section-help">
+    Holdingbolaget antas &auml;gas till 100&nbsp;% av dig och &auml;ga din andel av bolaget ovan.
+    &Ouml;ver 50&nbsp;% r&auml;knas bolagets l&ouml;ner med i holdingbolagets l&ouml;neunderlag.
+  </p>
+  {#if agarandel <= 50}
+    <div class="input-group">
+      <label class="checkbox-row first">
+        <input type="checkbox" bind:checked={dotterbolagOverride} />
+        <span>Best&auml;mmande inflytande (dotterbolag enligt &Aring;RL 1:4)</span>
+      </label>
+      <p class="input-help">
+        Kryssa i om holdingbolaget har best&auml;mmande inflytande via t.ex.
+        r&ouml;stmajoritet, styrelsemajoritet eller avtal &mdash; trots kapitalandel under 50 %.
+      </p>
+    </div>
+  {/if}
 
   <div class="input-group">
     <div class="input-header">
@@ -365,6 +408,27 @@
 </div>
 
 <style>
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .section-help {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin: calc(-1 * var(--spacing-sm)) 0 var(--spacing-lg);
+  }
+
+  .checkbox-row.first {
+    margin-top: 0;
+  }
+
   .panel-header {
     display: flex;
     justify-content: space-between;
@@ -406,9 +470,16 @@
 
   .input-header {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: baseline;
+    gap: var(--spacing-sm);
     margin-bottom: var(--spacing-sm);
+  }
+
+  .input-header > label {
+    /* Etiketten krymper och radbryts först; fältet flyttas ner först när etiketten inte ryms */
+    flex: 1 1 8rem;
   }
 
   label {
@@ -418,6 +489,8 @@
 
   .input-value-wrapper {
     flex-shrink: 0;
+    /* Håll fältet högerställt även när det bryts ner på egen rad */
+    margin-left: auto;
   }
 
   .input-number {
@@ -430,8 +503,9 @@
     border-radius: 6px;
     padding: 2px 8px;
     text-align: right;
-    width: auto;
-    max-width: 160px;
+    /* Fast bredd som rymmer "15 000 000 kr" (reglagens max); standardbredden sprängde kortet på smala skärmar */
+    width: 8.8em;
+    max-width: 50vw;
     font-family: inherit;
     transition: border-color 0.15s ease, background-color 0.15s ease;
   }
