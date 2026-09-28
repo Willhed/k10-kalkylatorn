@@ -50,9 +50,10 @@
     <div class="card explainer-card">
       <h2 class="card-title">Direkt ägande vs holdingbolag</h2>
       <ul>
-        <li><strong>Gränsbelopp</strong> — lika stort i båda fallen, förutsatt att holdingbolaget har bestämmande inflytande (äger &gt;50&nbsp;% av kapitalet eller styr styrelsetillsättningen).</li>
+        <li><strong>Grundbelopp</strong> — större via holdingbolag om du äger mindre än 100&nbsp;% av bolaget. Du äger holdingbolaget helt och får därför hela grundbeloppet (4&nbsp;×&nbsp;IBB), mot bara din andel vid direkt ägande.</li>
+        <li><strong>Lönebaserat utrymme</strong> — lika stort i båda fallen, förutsatt att holdingbolaget har bestämmande inflytande (äger &gt;50&nbsp;% av kapitalet eller styr styrelsetillsättningen). Annars räknas bolagets löner inte med.</li>
         <li><strong>Skatt vid uttag</strong> — samma regler: 20&nbsp;% inom gränsbeloppet, tjänstebeskattning på överskott.</li>
-        <li><strong>Fördel holding</strong> — du styr när du tar ut privat; kapitalet växer obeskattad i mellanledet.</li>
+        <li><strong>Fördel holding</strong> — du styr när du tar ut privat; kapitalet växer obeskattat i mellanledet.</li>
         <li><strong>Nackdel holding</strong> — ett bolag extra innebär mer bokföring, årsredovisning och initiala bolagskostnader.</li>
       </ul>
       <p>
@@ -65,7 +66,7 @@
       <div class="changes-grid">
         <div class="change-item">
           <span class="change-label">Grundbeloppet h&ouml;js</span>
-          <p>Fr&aring;n 2,75 × IBB till <strong>4 × IBB</strong> per &auml;garprocentenhet. Gynnar &auml;gare med l&aring;g l&ouml;nesumma.</p>
+          <p>Fr&aring;n 2,75 × IBB till <strong>4 × IBB</strong> i f&ouml;rh&aring;llande till din &auml;garandel. Gynnar &auml;gare med l&aring;g l&ouml;nesumma.</p>
         </div>
         <div class="change-item">
           <span class="change-label">L&ouml;nekravet avskaffas</span>
