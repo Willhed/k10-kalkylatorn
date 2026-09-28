@@ -77,7 +77,7 @@
   {#if breakEven.lonsamt}
     <div class="cta">
       <p class="cta-text">Vill du ha hj&auml;lp att s&auml;tta upp holdingbolaget?</p>
-      <a href={mejl} class="btn btn-primary">Skicka mejl</a>
+      <a href={mejl} class="btn btn-primary" data-umami-event="Skicka mejl" data-umami-event-plats="break-even">Skicka mejl</a>
     </div>
   {/if}
 

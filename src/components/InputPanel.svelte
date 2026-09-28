@@ -68,7 +68,7 @@
 <div class="card input-panel">
   <div class="panel-header">
     <h2>Parametrar</h2>
-    <button type="button" class="share-btn" onclick={kopieraLank}>
+    <button type="button" class="share-btn" onclick={kopieraLank} data-umami-event="Kopiera länk">
       {kopierad ? 'Kopierad!' : 'Kopiera länk'}
     </button>
   </div>
