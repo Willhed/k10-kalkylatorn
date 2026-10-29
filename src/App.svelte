@@ -161,8 +161,10 @@
        man prövar i panelen, så panelen ska inte följa med ner hit -->
   <K10Card
     bind:agarandel
+    {totalLonesumma}
+    {sparatUtrymme}
     omkostnadsbelopp={omkostnadsbeloppDirekt}
-    {ovrigaAgarandelar}
+    {ovrigaBolag}
   />
 
   <ExplainerSection />
