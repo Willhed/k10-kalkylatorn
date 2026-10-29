@@ -156,7 +156,7 @@
       <ResultsTable {direktResult} {holdingResult} />
 
       <K10Card
-        {totalLonesumma}
+        bind:agarandel
         omkostnadsbelopp={omkostnadsbeloppDirekt}
         {sparatUtrymme}
         {ovrigaAgarandelar}
