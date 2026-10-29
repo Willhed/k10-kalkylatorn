@@ -36,3 +36,10 @@ export const OMKOSTNAD_TRÖSKEL = 100_000;
 // Skattesatser
 export const KAPITALSKATT = 0.20;           // 20% inom gränsbelopp
 export const PROGRESSIV_SKATT_APPROX = 0.50; // ~50% över gränsbelopp (approximation)
+
+// K10-blanketten per utdelningsår, enligt Skatteverkets fältnamnstabell
+// (SKV 269, K10_SKV2110-39-04-26-01). Taket i p. 2.3 är 90 × IBB för utdelningsåret.
+export const K10_BLANKETTER = {
+  2026: { blankettblock: 'K10-2026P4', takTjanstUtdelning: 7_506_000 },
+};
+export const K10_BLANKETT = K10_BLANKETTER[UTDELNINGSAR];

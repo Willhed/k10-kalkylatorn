@@ -8,6 +8,7 @@
   import MobileResultBar from './components/MobileResultBar.svelte';
   import SavingsCard from './components/SavingsCard.svelte';
   import BreakEvenCard from './components/BreakEvenCard.svelte';
+  import K10Card from './components/K10Card.svelte';
   import ExplainerSection from './components/ExplainerSection.svelte';
   import Footer from './components/Footer.svelte';
   import { readState, writeState } from './lib/urlState.js';
@@ -153,6 +154,13 @@
         bind:planeradUtdelning
       />
       <ResultsTable {direktResult} {holdingResult} />
+
+      <K10Card
+        {totalLonesumma}
+        omkostnadsbelopp={omkostnadsbeloppDirekt}
+        {sparatUtrymme}
+        {ovrigaAgarandelar}
+      />
     </div>
   </div>
 
