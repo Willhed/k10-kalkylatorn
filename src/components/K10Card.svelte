@@ -16,6 +16,8 @@
   let egenLon = $state(0);
   let utdelning = $state(0);
   let bekraftat = $state(false);
+  // Vilka fälts förklaringar som är öppna
+  let hjalp = $state({});
 
   const formatAntal = (n) => (n > 0 ? new Intl.NumberFormat('sv-SE').format(n) : '');
 
@@ -80,24 +82,55 @@
     </label>
   </div>
 
+  <!-- Varje fält har en ?-knapp med förklaring; knapp i stället för hover så att det fungerar på mobil -->
+  {#snippet rubrik(id, text, valfritt = false)}
+    <div class="field-label">
+      <label for="k10-{id}">{text}{#if valfritt}&nbsp;<em>(valfritt)</em>{/if}</label>
+      <button
+        type="button"
+        class="help-btn"
+        aria-expanded={!!hjalp[id]}
+        aria-controls="k10-{id}-hjalp"
+        aria-label="Förklaring: {text}"
+        onclick={() => (hjalp[id] = !hjalp[id])}
+      >?</button>
+    </div>
+  {/snippet}
+
   <div class="fields">
-    <label class="field">
-      <span>Ditt personnummer</span>
-      <input type="text" inputmode="numeric" autocomplete="off" placeholder="&Aring;&Aring;&Aring;&Aring;MMDD-NNNN" bind:value={personnummer} />
+    <div class="field">
+      {@render rubrik('pnr', 'Ditt personnummer')}
+      <input id="k10-pnr" type="text" inputmode="numeric" autocomplete="off" placeholder="&Aring;&Aring;&Aring;&Aring;MMDD-NNNN" bind:value={personnummer} />
+      {#if hjalp.pnr}
+        <p id="k10-pnr-hjalp" class="help">
+          Tolv siffror, med &aring;rhundradet f&ouml;rst. Personnumret skrivs bara in i filen och
+          skickas ingenstans.
+        </p>
+      {/if}
       {#if personnummer && !pnr}<small class="error">Ange tolv siffror, t.ex. 19800101-1234.</small>{/if}
-    </label>
-    <label class="field">
-      <span>Ditt namn <em>(valfritt)</em></span>
-      <input type="text" autocomplete="off" bind:value={namn} />
-    </label>
-    <label class="field">
-      <span>Bolagets organisationsnummer</span>
-      <input type="text" inputmode="numeric" autocomplete="off" placeholder="NNNNNN-NNNN" bind:value={orgnr} />
+    </div>
+    <div class="field">
+      {@render rubrik('namn', 'Ditt namn', true)}
+      <input id="k10-namn" type="text" autocomplete="off" bind:value={namn} />
+      {#if hjalp.namn}
+        <p id="k10-namn-hjalp" class="help">Visas p&aring; kvittot n&auml;r du l&auml;mnar filen. P&aring;verkar inte ber&auml;kningen.</p>
+      {/if}
+    </div>
+    <div class="field">
+      {@render rubrik('orgnr', 'Bolagets organisationsnummer')}
+      <input id="k10-orgnr" type="text" inputmode="numeric" autocomplete="off" placeholder="NNNNNN-NNNN" bind:value={orgnr} />
+      {#if hjalp.orgnr}
+        <p id="k10-orgnr-hjalp" class="help">
+          Tio siffror f&ouml;r bolaget vars aktier K10:an g&auml;ller. Finns p&aring; registreringsbeviset
+          och i bolagets årsredovisning.
+        </p>
+      {/if}
       {#if orgnr && !org}<small class="error">Kontrollera organisationsnumret.</small>{/if}
-    </label>
-    <label class="field">
-      <span>Aktier du &auml;gde 1 januari {UTDELNINGSAR}</span>
+    </div>
+    <div class="field">
+      {@render rubrik('agda', `Aktier du ägde 1 januari ${UTDELNINGSAR}`)}
       <input
+        id="k10-agda"
         class="input-number"
         type="text"
         inputmode="numeric"
@@ -106,10 +139,17 @@
         onblur={(e) => handleBlur(e, 0, Infinity, (v) => (aktierAgda = v), formatAntal)}
         onkeydown={handleKeydown}
       />
-    </label>
-    <label class="field">
-      <span>Totalt antal aktier i bolaget 1 januari {UTDELNINGSAR}</span>
+      {#if hjalp.agda}
+        <p id="k10-agda-hjalp" class="help">
+          Antalet aktier, inte procent, som du sj&auml;lv &auml;gde vid &aring;rets b&ouml;rjan. Finns i
+          bolagets aktiebok. Din &auml;garandel r&auml;knas fram ur antalet.
+        </p>
+      {/if}
+    </div>
+    <div class="field">
+      {@render rubrik('totalt', `Totalt antal aktier i bolaget 1 januari ${UTDELNINGSAR}`)}
       <input
+        id="k10-totalt"
         class="input-number"
         type="text"
         inputmode="numeric"
@@ -118,11 +158,18 @@
         onblur={(e) => handleBlur(e, 0, Infinity, (v) => (aktierTotalt = v), formatAntal)}
         onkeydown={handleKeydown}
       />
+      {#if hjalp.totalt}
+        <p id="k10-totalt-hjalp" class="help">
+          Alla aktier i bolaget vid &aring;rets b&ouml;rjan, oavsett vem som &auml;ger dem. Finns i
+          aktieboken och i bolagsordningen eller hos Bolagsverket.
+        </p>
+      {/if}
       {#if aktierAgda > 0 && aktierTotalt > 0 && !aktierOk}<small class="error">Du kan inte &auml;ga fler aktier &auml;n bolaget har.</small>{/if}
-    </label>
-    <label class="field">
-      <span>Din kontanta l&ouml;n fr&aring;n bolaget {IBB_AR}</span>
+    </div>
+    <div class="field">
+      {@render rubrik('lon', `Din och närståendes kontanta lön från bolaget ${IBB_AR}`)}
       <input
+        id="k10-lon"
         class="input-number"
         type="text"
         inputmode="numeric"
@@ -131,11 +178,32 @@
         onblur={(e) => handleBlur(e, 0, Infinity, (v) => (egenLon = v), formatSEK)}
         onkeydown={handleKeydown}
       />
-      <small>Inklusive n&auml;rst&aring;endes. Begr&auml;nsar det l&ouml;nebaserade utrymmet till 50 &times; l&ouml;nen.</small>
-    </label>
-    <label class="field">
-      <span>Utdelning du f&aring;tt under {UTDELNINGSAR}</span>
+      {#if hjalp.lon}
+        <div id="k10-lon-hjalp" class="help">
+          <p>
+            <strong>Kontant l&ouml;n</strong> &auml;r utbetald bruttol&ouml;n under {IBB_AR}, allts&aring;
+            f&ouml;re skatt, inklusive bonus och semesterers&auml;ttning. F&ouml;rm&aring;ner som bil
+            eller friskv&aring;rd r&auml;knas inte, och inte heller pension, arbetsgivaravgifter
+            eller utdelning.
+          </p>
+          <p>
+            Ditt l&ouml;nebaserade utrymme f&aring;r vara h&ouml;gst 50 g&aring;nger summan av din och
+            dina <strong>n&auml;rst&aring;endes</strong> kontanta l&ouml;n fr&aring;n bolaget. N&auml;rst&aring;ende &auml;r:
+          </p>
+          <ul>
+            <li>make eller maka, och sambo om ni har eller har haft gemensamma barn eller har varit gifta,</li>
+            <li>f&ouml;r&auml;ldrar, far- och morf&ouml;r&auml;ldrar,</li>
+            <li>barn och barnbarn (&auml;ven styv- och fosterbarn) och deras makar,</li>
+            <li>syskon, syskons makar och syskons barn,</li>
+            <li>d&ouml;dsbon d&auml;r du eller n&aring;gon av dessa &auml;r del&auml;gare.</li>
+          </ul>
+        </div>
+      {/if}
+    </div>
+    <div class="field">
+      {@render rubrik('utdelning', `Utdelning du fått under ${UTDELNINGSAR}`)}
       <input
+        id="k10-utdelning"
         class="input-number"
         type="text"
         inputmode="numeric"
@@ -144,7 +212,14 @@
         onblur={(e) => handleBlur(e, 0, Infinity, (v) => (utdelning = v), formatSEK)}
         onkeydown={handleKeydown}
       />
-    </label>
+      {#if hjalp.utdelning}
+        <p id="k10-utdelning-hjalp" class="help">
+          Utdelning f&ouml;re skatt som betalades ut till dig under {UTDELNINGSAR}, oftast den som
+          beslutades p&aring; &aring;rsst&auml;mman. Har du inte f&aring;tt n&aring;gon, l&aring;t den vara 0 kr;
+          d&aring; sparas hela gr&auml;nsbeloppet till n&auml;sta &aring;r.
+        </p>
+      {/if}
+    </div>
   </div>
 
   {#if k10}
@@ -269,9 +344,35 @@
     font-weight: 500;
   }
 
-  .field em {
+  .field-label label {
+    font-weight: 500;
+  }
+
+  .field-label em {
     font-weight: 400;
     color: var(--color-text-muted);
+  }
+
+  /* ?-knappen följer textflödet efter sista ordet */
+  .field-label .help-btn {
+    margin-left: 4px;
+    vertical-align: 1px;
+  }
+
+  .help {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  .help p + p,
+  .help ul {
+    margin-top: var(--spacing-xs);
+  }
+
+  .help ul {
+    padding-left: var(--spacing-lg);
   }
 
   .field input[type="text"]:not(.input-number) {

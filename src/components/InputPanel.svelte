@@ -66,7 +66,7 @@
     bind:value={totalLonesumma}
     sliderMax={15_000_000}
     step={50_000}
-    help="Alla anställdas kontanta bruttolöner under föregående år, inklusive dina egna."
+    help="Alla anställdas utbetalda bruttolöner under föregående år, inklusive dina egna. Förmåner och lön som täcks av statliga lönebidrag räknas inte."
   />
 
   <NumberField
