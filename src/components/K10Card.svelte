@@ -27,10 +27,30 @@
   let ovrigaBolag = $state([]);
   // Dotterföretag: { orgnr (som skrivet), loner, andel (procent) }; blanketten har plats för fyra
   let dotterforetag = $state([]);
-  const MAX_DOTTER = 4;
+  // Blanketten har fyra rutor för organisationsnummer till dotterföretag där du eller
+  // närstående har tagit ut lön (fältnamnstabellen: "Om löneuttag enligt ovan gjorts i
+  // dotterföretag"). Övriga dotterföretag behöver organisationsnummer bara för beräkningen.
+  const RUTOR_LONEUTTAG = 4;
   let dotterNr = $derived(dotterforetag.map((d) => normaliseraOrgnr(d.orgnr)));
   let dotterDubblett = $derived(dotterNr.map((nr, i) => !!nr && dotterNr.indexOf(nr) !== i));
   let dotterOk = $derived(dotterNr.every(Boolean) && !dotterDubblett.some(Boolean));
+  let loneuttagNr = $derived(dotterNr.filter((nr, i) => nr && !dotterDubblett[i] && dotterforetag[i].loneuttag));
+  let loneuttagOvriga = $derived(loneuttagNr.slice(RUTOR_LONEUTTAG));
+  let fritextKopierad = $state(false);
+  let fritext = $derived(
+    `Lön till delägaren eller närstående har även tagits ut i ${loneuttagOvriga.length === 1 ? 'dotterföretaget' : 'dotterföretagen'} ${loneuttagOvriga
+      .map((nr) => `${nr.slice(2, 8)}-${nr.slice(8)}`)
+      .join(', ')}.`
+  );
+  async function kopieraFritext() {
+    try {
+      await navigator.clipboard.writeText(fritext);
+      fritextKopierad = true;
+      setTimeout(() => (fritextKopierad = false), 2000);
+    } catch {
+      fritextKopierad = false;
+    }
+  }
   let egenLon = $state(0);
   let utdelning = $state(0);
   let bekraftat = $state(false);
@@ -95,7 +115,7 @@
   let kanLaddaNer = $derived(k10 && pnr && org && bekraftat && dotterOk);
 
   function laddaNer() {
-    const sru = skapaBlanketterSru({ personnummer: pnr, namn, orgnr: org, aktierAgda, aktierTotalt, rutor: k10.rutor, dotterOrgnr: dotterNr });
+    const sru = skapaBlanketterSru({ personnummer: pnr, namn, orgnr: org, aktierAgda, aktierTotalt, rutor: k10.rutor, dotterOrgnr: loneuttagNr });
     const url = URL.createObjectURL(new Blob([tillLatin1(sru)], { type: 'text/plain;charset=iso-8859-1' }));
     const a = document.createElement('a');
     a.href = url;
@@ -118,7 +138,7 @@
   <div class="scope">
     <p>Verktyget t&auml;cker bara det enkla fallet. Det st&auml;mmer f&ouml;r dig om:</p>
     <ul>
-      <li>bolaget &auml;r svenskt och har h&ouml;gst fyra dotterf&ouml;retag, alla svenska,</li>
+      <li>bolaget och alla dess dotterf&ouml;retag &auml;r svenska,</li>
       <li>du &auml;gde aktierna hela {IBB_AR} och vid ing&aring;ngen av {UTDELNINGSAR},</li>
       <li>du inte s&aring;lt eller gett bort aktier under {UTDELNINGSAR},</li>
       <li>ingen make, maka eller sambo &auml;ger aktier i bolaget (sambo r&auml;knas om ni har varit gifta eller har eller har haft barn tillsammans).</li>
@@ -357,6 +377,10 @@
               andelen. Ett handelsbolag eller kommanditbolag r&auml;knas bara om det &auml;gs till
               100&nbsp;%; organisationsnummer som b&ouml;rjar p&aring; 9 behandlas som s&aring;dana.
             </p>
+            <p>
+              Kryssa i om du eller n&auml;rst&aring;ende fick l&ouml;n fr&aring;n dotterf&ouml;retaget. D&aring;
+              skrivs organisationsnumret in p&aring; blanketten, som har plats f&ouml;r fyra.
+            </p>
           </div>
         {/if}
         {#each dotterforetag as d, i}
@@ -406,10 +430,14 @@
             </label>
             <button type="button" class="remove-btn" onclick={() => dotterforetag.splice(i, 1)} aria-label="Ta bort dotterföretag {i + 1}">&times;</button>
           </div>
+          <label class="checkbox-row dotter-uttag">
+            <input type="checkbox" bind:checked={dotterforetag[i].loneuttag} />
+            <span>Du eller n&auml;rst&aring;ende fick l&ouml;n h&auml;rifr&aring;n {IBB_AR}</span>
+          </label>
           {#if d.orgnr && !dotterNr[i]}
             <small class="error">Kontrollera organisationsnumret.</small>
           {:else if !d.orgnr}
-            <small>Organisationsnummer kr&auml;vs; det skrivs in p&aring; blanketten.</small>
+            <small>Organisationsnummer kr&auml;vs f&ouml;r att avg&ouml;ra om bolaget &auml;r ett handelsbolag.</small>
           {:else if dotterDubblett[i]}
             <small class="error">Samma dotterf&ouml;retag finns redan ovan.</small>
           {:else if dr?.handelsbolag && d.andel < 100}
@@ -418,10 +446,18 @@
             <small>R&auml;knas med {formatSEK(dr.raknas)}.</small>
           {/if}
         {/each}
-        {#if dotterforetag.length < MAX_DOTTER}
-          <button type="button" class="add-btn" onclick={() => dotterforetag.push({ orgnr: '', loner: 0, andel: 100 })}>+ L&auml;gg till dotterf&ouml;retag</button>
-        {:else}
-          <small>Blanketten har plats f&ouml;r fyra dotterf&ouml;retag.</small>
+        <button type="button" class="add-btn" onclick={() => dotterforetag.push({ orgnr: '', loner: 0, andel: 100, loneuttag: false })}>+ L&auml;gg till dotterf&ouml;retag</button>
+        {#if loneuttagOvriga.length}
+          <div class="fritext">
+            <p>
+              Blanketten har bara plats f&ouml;r fyra dotterf&ouml;retag med l&ouml;neuttag. Skriv de
+              &ouml;vriga under <em>&Ouml;vriga upplysningar</em> i e-tj&auml;nsten:
+            </p>
+            <p class="fritext-text">{fritext}</p>
+            <button type="button" class="hamta-btn" onclick={kopieraFritext}>
+              {fritextKopierad ? 'Kopierad!' : 'Kopiera texten'}
+            </button>
+          </div>
         {/if}
       </div>
       </div>
@@ -841,6 +877,33 @@
     align-items: end;
     gap: var(--spacing-sm);
     max-width: 40rem;
+    /* Linje mellan dotterföretagen så att raderna inte flyter ihop */
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+  }
+
+  .checkbox-row.dotter-uttag {
+    font-size: 0.85rem;
+    font-weight: 400;
+  }
+
+  .fritext {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+    background: var(--color-accent-light);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.85rem;
+    font-weight: 400;
+    max-width: 40rem;
+  }
+
+  .fritext-text {
+    font-family: ui-monospace, monospace;
+    font-size: 0.8rem;
   }
 
   .dotter-cell {
