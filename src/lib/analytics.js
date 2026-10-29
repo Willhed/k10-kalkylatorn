@@ -14,5 +14,7 @@ export function loadAnalytics() {
   script.src = SCRIPT_URL;
   script.dataset.websiteId = websiteId;
   script.dataset.domains = DOMAINS;
+  // Kalkylatorn skriver om query-strängen när reglagen ändras; räkna bara byte av sida
+  script.dataset.excludeSearch = 'true';
   document.head.appendChild(script);
 }

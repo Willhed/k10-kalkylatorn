@@ -63,7 +63,8 @@ html {
 }
 
 #utdelningsutrymme,
-#holdingbolag {
+#holdingbolag,
+#k10 {
   scroll-margin-top: var(--spacing-md);
 }
 
