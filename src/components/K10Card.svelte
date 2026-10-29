@@ -403,7 +403,7 @@
     </div>
 
     {#if k10.lonebaseratBegransat}
-      <p class="note">Det l&ouml;nebaserade utrymmet i p. 1.2 &auml;r begr&auml;nsat till 50 &times; din l&ouml;n.</p>
+      <p class="note">Det l&ouml;nebaserade utrymmet i p. 1.2 &auml;r begr&auml;nsat till 50 &times; din och n&auml;rst&aring;endes l&ouml;n.</p>
     {/if}
 
     <dl class="summary">
@@ -683,6 +683,10 @@
     font-size: 1rem;
     font-weight: 600;
     color: var(--color-primary);
+  }
+
+  .ladda-ner-rubrik + .note {
+    margin: 0 0 var(--spacing-md);
   }
 
   .hamta {
