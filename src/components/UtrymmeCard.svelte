@@ -1,6 +1,6 @@
 <script>
   import { formatSEK } from '../lib/formatters.js';
-  import { UTDELNINGSAR, KAPITALSKATT } from '../lib/constants.js';
+  import { UTDELNINGSAR, IBB_AR, KAPITALSKATT } from '../lib/constants.js';
 
   let { direktResult, sparatUtrymme, egenLon, utrymme: totalt } = $props();
 </script>
@@ -35,8 +35,8 @@
       <dd>{formatSEK(direktResult.lonebaseratUtrymme)}</dd>
       {#if direktResult.lonebaseratUtrymme > 0}
         <dd class="row-note">
-          F&ouml;ruts&auml;tter att du tar ut minst {formatSEK(egenLon)} i l&ouml;n,
-          annars begr&auml;nsas det av 50&times;-taket.
+          F&ouml;ruts&auml;tter att du och dina n&auml;rst&aring;ende fick minst {formatSEK(egenLon)} i
+          kontant l&ouml;n fr&aring;n bolaget {IBB_AR}, annars begr&auml;nsas det av 50&times;-taket.
         </dd>
       {/if}
     </div>

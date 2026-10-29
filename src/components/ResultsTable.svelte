@@ -133,9 +133,11 @@
     </table>
   </div>
   <p class="table-note">
-    Holdingbolaget &auml;gs till 100 % av dig. Om operativbolaget &auml;r ett dotterbolag
-    (kapitalandel &ouml;ver 50 % eller best&auml;mmande inflytande enligt &Aring;RL 1:4)
-    r&auml;knas l&ouml;ner fr&aring;n dotterbolaget in i K10-ber&auml;kningen.
+    Holdingbolaget &auml;gs till 100 % av dig. Om operativbolaget &auml;r ett dotterf&ouml;retag
+    (mer &auml;n h&auml;lften av r&ouml;sterna eller annat best&auml;mmande inflytande enligt
+    aktiebolagslagen 1 kap. 11 &sect;) r&auml;knas l&ouml;ner fr&aring;n dotterf&ouml;retaget in i
+    K10-ber&auml;kningen. Kalkylatorn r&auml;knar med att din r&ouml;standel &auml;r lika stor som
+    kapitalandelen.
   </p>
   {#if direktResult.grundbeloppProportioneras || holdingResult.grundbeloppProportioneras}
     <div class="prop-notice">
