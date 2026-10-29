@@ -164,7 +164,7 @@
     {totalLonesumma}
     {sparatUtrymme}
     omkostnadsbelopp={omkostnadsbeloppDirekt}
-    {ovrigaAgarandelar}
+    {ovrigaBolag}
   />
 
   <ExplainerSection />

@@ -1,14 +1,19 @@
 <script>
   import { formatSEK, formatPercent } from '../lib/formatters.js';
   import { UTDELNINGSAR, IBB_AR } from '../lib/constants.js';
-  import { handleBlur, handleFocus, handleKeydown } from '../lib/numberInput.js';
+  import { clamp, parseNumber, roundTo, handleBlur, handleFocus, handleKeydown } from '../lib/numberInput.js';
   import { beraknaK10, normaliseraPersonnummer, normaliseraOrgnr, skapaBlanketterSru, tillLatin1 } from '../lib/k10.js';
 
-  // Omkostnadsbelopp och övriga bolag hämtas från panelen. Ägarandel, lönesumma och sparat
-  // utrymme har egna fält, eftersom K10 kräver de faktiska värdena per 1 januari, föregående år
-  // respektive förra årets K10, medan panelen är till för att pröva scenarier. Personuppgifterna här sparas inte i den
-  // delbara länken och lämnar aldrig webbläsaren.
-  let { agarandel = $bindable(), totalLonesumma, sparatUtrymme: panelSparat, omkostnadsbelopp, ovrigaAgarandelar } = $props();
+  // Steg 3 har egna fält för allt, eftersom K10 kräver de faktiska värdena medan panelen är
+  // till för att pröva scenarier. Panelens värden kan hämtas med en knapp. Personuppgifterna
+  // här sparas inte i den delbara länken och lämnar aldrig webbläsaren.
+  let {
+    agarandel = $bindable(),
+    totalLonesumma,
+    sparatUtrymme: panelSparat,
+    omkostnadsbelopp: panelOmkostnad,
+    ovrigaBolag: panelOvriga,
+  } = $props();
 
   let personnummer = $state('');
   let namn = $state('');
@@ -17,6 +22,9 @@
   let aktierTotalt = $state(0);
   let lonesumma = $state(0);
   let sparatUtrymme = $state(0);
+  let omkostnadsbelopp = $state(0);
+  // Övriga fåmansbolag: { namn, andel (procent) }, som i panelen
+  let ovrigaBolag = $state([]);
   let egenLon = $state(0);
   let utdelning = $state(0);
   let bekraftat = $state(false);
@@ -29,6 +37,8 @@
   function hamtaFranPanelen() {
     lonesumma = totalLonesumma;
     sparatUtrymme = panelSparat;
+    omkostnadsbelopp = panelOmkostnad;
+    ovrigaBolag = panelOvriga.map((b) => ({ ...b }));
     hamtat = true;
   }
 
@@ -48,7 +58,7 @@
           omkostnadsbelopp,
           sparatUtrymme,
           utdelning,
-          ovrigaAgarandelar,
+          ovrigaAgarandelar: ovrigaBolag.map((b) => b.andel / 100),
         })
       : null
   );
@@ -116,14 +126,15 @@
 
   <div class="hamta">
     <p>
-      Har du redan fyllt i panelen med dina faktiska v&auml;rden f&ouml;r {IBB_AR}?
+      Har du redan fyllt i panelen med dina faktiska v&auml;rden? Knappen h&auml;mtar
+      l&ouml;nesumma ({formatSEK(totalLonesumma)}), sparat utrymme ({formatSEK(panelSparat)}),
+      omkostnadsbelopp ({formatSEK(panelOmkostnad)}) och
+      {panelOvriga.length === 1 ? '1 övrigt bolag' : `${panelOvriga.length || 'inga'} övriga bolag`}.
       {#if hamtat}
         <strong>H&auml;mtat.</strong> Kontrollera f&auml;lten nedan.
       {/if}
     </p>
-    <button type="button" class="hamta-btn" onclick={hamtaFranPanelen}>
-      H&auml;mta l&ouml;nesumma ({formatSEK(totalLonesumma)}) och sparat utrymme ({formatSEK(panelSparat)}) fr&aring;n panelen
-    </button>
+    <button type="button" class="hamta-btn" onclick={hamtaFranPanelen}>H&auml;mta fr&aring;n panelen</button>
   </div>
 
   <div class="fields">
@@ -292,14 +303,77 @@
         </p>
       {/if}
     </div>
-  </div>
-
-  <div class="fran-panelen">
-    <p>Fr&aring;n panelen &ndash; &auml;ndra d&auml;r om det inte st&auml;mmer per 1 januari {UTDELNINGSAR}:</p>
-    <dl>
-      <div><dt>Omkostnadsbelopp</dt><dd>{formatSEK(omkostnadsbelopp)}</dd></div>
-      <div><dt>&Ouml;vriga f&aring;mansbolag</dt><dd>{ovrigaAgarandelar.length || 'inga'}</dd></div>
-    </dl>
+    <div class="field">
+      {@render rubrik('omkostnad', `Omkostnadsbelopp för dina aktier 1 januari ${UTDELNINGSAR}`)}
+      <input
+        id="k10-omkostnad"
+        class="input-number"
+        type="text"
+        inputmode="numeric"
+        value={formatSEK(omkostnadsbelopp)}
+        onfocus={handleFocus}
+        onblur={(e) => handleBlur(e, 0, Infinity, (v) => (omkostnadsbelopp = v), formatSEK)}
+        onkeydown={handleKeydown}
+      />
+      {#if hjalp.omkostnad}
+        <p id="k10-omkostnad-hjalp" class="help">
+          Det belopp du hade f&aring;tt dra av om du s&aring;lt aktierna vid &aring;rets b&ouml;rjan, oftast vad
+          du betalade f&ouml;r dem, t.ex. aktiekapitalet vid start. Tillskott som inte gjorts f&ouml;r att
+          varaktigt tillf&ouml;ra bolaget kapital r&auml;knas inte. Ger r&auml;nta bara p&aring; det som
+          &ouml;verstiger 100&nbsp;000&nbsp;kr.
+        </p>
+      {/if}
+    </div>
+    <div class="field ovriga">
+      <div class="field-label">
+        <span class="label-text">&Ouml;vriga f&aring;mansbolag du &auml;gde andelar i 1 januari {UTDELNINGSAR}</span>
+        <button
+          type="button"
+          class="help-btn"
+          aria-expanded={!!hjalp.ovriga}
+          aria-controls="k10-ovriga-hjalp"
+          aria-label="Förklaring: övriga fåmansbolag"
+          onclick={() => (hjalp.ovriga = !hjalp.ovriga)}
+        >?</button>
+      </div>
+      {#if hjalp.ovriga}
+        <p id="k10-ovriga-hjalp" class="help">
+          Grundbeloppet f&aring;r bara r&auml;knas en g&aring;ng totalt. &Auml;ger du kvalificerade andelar
+          i flera f&aring;mansbolag delas det mellan bolagen i f&ouml;rh&aring;llande till hur stora
+          andelar du &auml;ger. Ange din &auml;garandel i vart och ett av de andra bolagen.
+        </p>
+      {/if}
+      {#each ovrigaBolag as bolag, i}
+        <div class="ovriga-row">
+          <input
+            class="ovriga-namn"
+            type="text"
+            placeholder="Bolag {i + 1}"
+            aria-label="Namn på övrigt bolag {i + 1}"
+            bind:value={ovrigaBolag[i].namn}
+            onkeydown={handleKeydown}
+          />
+          <input
+            class="input-number ovriga-andel"
+            type="text"
+            inputmode="numeric"
+            aria-label="Din ägarandel i {bolag.namn || 'bolag ' + (i + 1)}"
+            value={formatPercent(bolag.andel)}
+            onfocus={handleFocus}
+            onblur={(e) => {
+              const val = parseNumber(e.target.value);
+              if (!isNaN(val)) {
+                ovrigaBolag[i].andel = clamp(roundTo(val, 2), 0.01, 100);
+                e.target.value = formatPercent(ovrigaBolag[i].andel);
+              }
+            }}
+            onkeydown={handleKeydown}
+          />
+          <button type="button" class="remove-btn" onclick={() => ovrigaBolag.splice(i, 1)} aria-label="Ta bort {bolag.namn || 'bolag ' + (i + 1)}">&times;</button>
+        </div>
+      {/each}
+      <button type="button" class="add-btn" onclick={() => ovrigaBolag.push({ namn: '', andel: 100 })}>+ L&auml;gg till bolag</button>
+    </div>
   </div>
 
   {#if k10}
@@ -545,114 +619,67 @@
     border-color: var(--color-primary);
   }
 
-  .fran-panelen {
-    font-size: 0.85rem;
-    color: var(--color-text-muted);
-    margin-bottom: var(--spacing-lg);
+  .ovriga {
+    grid-column: 1 / -1;
   }
 
-  .fran-panelen dl {
-    max-width: 420px;
-    margin-top: var(--spacing-xs);
+  .label-text {
+    font-weight: 500;
   }
 
-  .fran-panelen dl div {
+  .ovriga-row {
     display: flex;
-    justify-content: space-between;
-    gap: var(--spacing-md);
+    align-items: center;
+    gap: var(--spacing-sm);
+    max-width: 32rem;
   }
 
-  .fran-panelen dd {
-    color: var(--color-text);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-
-  .table-wrapper {
-    overflow-x: auto;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-  }
-
-  td {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .avsnitt th {
-    text-align: left;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-muted);
-    padding: var(--spacing-md) var(--spacing-sm) var(--spacing-xs);
-  }
-
-  .punkt {
-    width: 3.5em;
-    color: var(--color-text-muted);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .val {
-    text-align: right;
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-  }
-
-  tr.total td {
-    font-weight: 700;
-  }
-
-  .summary {
-    margin: var(--spacing-lg) 0;
-    max-width: 480px;
-  }
-
-  .summary div {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--spacing-md);
-    font-size: 0.9rem;
-    padding: var(--spacing-xs) 0;
-  }
-
-  .summary dd {
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-
-  .download-btn {
-    background: var(--color-primary);
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
+  .ovriga-namn {
+    flex: 1;
+    min-width: 0;
     font-family: inherit;
     font-size: 0.95rem;
-    font-weight: 600;
-    padding: var(--spacing-sm) var(--spacing-lg);
+    padding: 4px 8px;
+    border: 1.5px solid var(--color-border);
+    border-radius: 6px;
+    color: var(--color-text);
+  }
+
+  .field .ovriga-andel {
+    width: 6.5em;
+    flex: none;
+    text-align: right;
+  }
+
+  .remove-btn {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    color: var(--color-text-muted);
     cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 2px 7px;
   }
 
-  .download-btn:disabled {
-    background: var(--color-border);
-    color: var(--color-text-muted);
-    cursor: not-allowed;
+  .remove-btn:hover {
+    color: var(--color-danger);
+    border-color: var(--color-danger);
   }
 
-  .note {
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
-    margin-top: var(--spacing-sm);
-  }
-
-  .howto {
+  .add-btn {
+    align-self: flex-start;
+    background: none;
+    border: 1px dashed var(--color-border);
+    border-radius: 6px;
+    color: var(--color-primary);
+    cursor: pointer;
+    font-family: inherit;
     font-size: 0.85rem;
-    margin-top: var(--spacing-lg);
+    padding: var(--spacing-xs) var(--spacing-md);
+  }
+
+  .add-btn:hover {
+    border-color: var(--color-primary);
   }
 </style>
