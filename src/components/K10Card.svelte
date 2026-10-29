@@ -4,11 +4,11 @@
   import { handleBlur, handleFocus, handleKeydown } from '../lib/numberInput.js';
   import { beraknaK10, normaliseraPersonnummer, normaliseraOrgnr, skapaBlanketterSru, tillLatin1 } from '../lib/k10.js';
 
-  // Omkostnadsbelopp, sparat utrymme och övriga bolag hämtas från panelen. Ägarandel och
-  // lönesumma har egna fält, eftersom K10 kräver värdena per 1 januari respektive föregående år
-  // medan panelen är till för att pröva scenarier. Personuppgifterna här sparas inte i den
+  // Omkostnadsbelopp och övriga bolag hämtas från panelen. Ägarandel, lönesumma och sparat
+  // utrymme har egna fält, eftersom K10 kräver de faktiska värdena per 1 januari, föregående år
+  // respektive förra årets K10, medan panelen är till för att pröva scenarier. Personuppgifterna här sparas inte i den
   // delbara länken och lämnar aldrig webbläsaren.
-  let { agarandel = $bindable(), omkostnadsbelopp, sparatUtrymme, ovrigaAgarandelar } = $props();
+  let { agarandel = $bindable(), omkostnadsbelopp, ovrigaAgarandelar } = $props();
 
   let personnummer = $state('');
   let namn = $state('');
@@ -16,6 +16,7 @@
   let aktierAgda = $state(0);
   let aktierTotalt = $state(0);
   let lonesumma = $state(0);
+  let sparatUtrymme = $state(0);
   let egenLon = $state(0);
   let utdelning = $state(0);
   let bekraftat = $state(false);
@@ -249,13 +250,33 @@
         </p>
       {/if}
     </div>
+    <div class="field">
+      {@render rubrik('sparat', 'Sparat utdelningsutrymme från förra årets K10')}
+      <input
+        id="k10-sparat"
+        class="input-number"
+        type="text"
+        inputmode="numeric"
+        value={formatSEK(sparatUtrymme)}
+        onfocus={handleFocus}
+        onblur={(e) => handleBlur(e, 0, Infinity, (v) => (sparatUtrymme = v), formatSEK)}
+        onkeydown={handleKeydown}
+      />
+      {#if hjalp.sparat}
+        <p id="k10-sparat-hjalp" class="help">
+          St&aring;r p&aring; din K10 f&ouml;r {IBB_AR} som <em>Sparat utdelningsutrymme till n&auml;sta &aring;r</em>:
+          p. 1.11 om du anv&auml;nde f&ouml;renklingsregeln, p. 2.12 om du anv&auml;nde huvudregeln.
+          Fick du ingen utdelning {IBB_AR} sparas hela gr&auml;nsbeloppet, p. 1.5 respektive p. 2.6.
+          Har du inget sparat utrymme, l&aring;t den vara 0 kr.
+        </p>
+      {/if}
+    </div>
   </div>
 
   <div class="fran-panelen">
     <p>Fr&aring;n panelen &ndash; &auml;ndra d&auml;r om det inte st&auml;mmer per 1 januari {UTDELNINGSAR}:</p>
     <dl>
       <div><dt>Omkostnadsbelopp</dt><dd>{formatSEK(omkostnadsbelopp)}</dd></div>
-      <div><dt>Sparat utdelningsutrymme</dt><dd>{formatSEK(sparatUtrymme)}</dd></div>
       <div><dt>&Ouml;vriga f&aring;mansbolag</dt><dd>{ovrigaAgarandelar.length || 'inga'}</dd></div>
     </dl>
   </div>

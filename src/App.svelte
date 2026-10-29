@@ -158,7 +158,6 @@
       <K10Card
         bind:agarandel
         omkostnadsbelopp={omkostnadsbeloppDirekt}
-        {sparatUtrymme}
         {ovrigaAgarandelar}
       />
     </div>
