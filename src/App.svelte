@@ -154,14 +154,16 @@
         bind:planeradUtdelning
       />
       <ResultsTable {direktResult} {holdingResult} />
-
-      <K10Card
-        bind:agarandel
-        omkostnadsbelopp={omkostnadsbeloppDirekt}
-        {ovrigaAgarandelar}
-      />
     </div>
   </div>
+
+  <!-- Steg 3 ligger utanför panelens kolumn: K10:an bygger på faktiska värden, inte på det
+       man prövar i panelen, så panelen ska inte följa med ner hit -->
+  <K10Card
+    bind:agarandel
+    omkostnadsbelopp={omkostnadsbeloppDirekt}
+    {ovrigaAgarandelar}
+  />
 
   <ExplainerSection />
 </main>
