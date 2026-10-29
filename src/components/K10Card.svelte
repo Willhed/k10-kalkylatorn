@@ -9,10 +9,10 @@
   // här sparas inte i den delbara länken och lämnar aldrig webbläsaren.
   let {
     agarandel = $bindable(),
-    totalLonesumma,
-    sparatUtrymme: panelSparat,
-    omkostnadsbelopp: panelOmkostnad,
-    ovrigaBolag: panelOvriga,
+    totalLonesumma = $bindable(),
+    sparatUtrymme: panelSparat = $bindable(),
+    omkostnadsbelopp: panelOmkostnad = $bindable(),
+    ovrigaBolag: panelOvriga = $bindable(),
   } = $props();
 
   let personnummer = $state('');
@@ -40,6 +40,16 @@
     omkostnadsbelopp = panelOmkostnad;
     ovrigaBolag = panelOvriga.map((b) => ({ ...b }));
     hamtat = true;
+  }
+
+  // Åt andra hållet: för över K10:ans faktiska värden till panelen och visa holdingjämförelsen
+  function visaHolding() {
+    if (andelProcent >= 1) agarandel = andelProcent;
+    totalLonesumma = lonesumma;
+    panelSparat = sparatUtrymme;
+    panelOmkostnad = omkostnadsbelopp;
+    panelOvriga = ovrigaBolag.map((b) => ({ ...b }));
+    document.getElementById('steg-2')?.scrollIntoView();
   }
 
   const formatAntal = (n) => (n > 0 ? new Intl.NumberFormat('sv-SE').format(n) : '');
@@ -138,40 +148,6 @@
   </div>
 
   <div class="fields">
-    <fieldset class="grupp">
-      <legend>Du och bolaget</legend>
-      <div class="grupp-falt">
-      <div class="field">
-        {@render rubrik('pnr', 'Ditt personnummer')}
-        <input id="k10-pnr" type="text" inputmode="numeric" autocomplete="off" placeholder="&Aring;&Aring;&Aring;&Aring;MMDD-NNNN" bind:value={personnummer} />
-        {#if hjalp.pnr}
-          <p id="k10-pnr-hjalp" class="help">
-            Tolv siffror, med &aring;rhundradet f&ouml;rst. Personnumret skrivs bara in i filen och
-            skickas ingenstans.
-          </p>
-        {/if}
-        {#if personnummer && !pnr}<small class="error">Ange tolv siffror, t.ex. 19800101-1234.</small>{/if}
-      </div>
-      <div class="field">
-        {@render rubrik('namn', 'Ditt namn', true)}
-        <input id="k10-namn" type="text" autocomplete="off" bind:value={namn} />
-        {#if hjalp.namn}
-          <p id="k10-namn-hjalp" class="help">Visas p&aring; kvittot n&auml;r du l&auml;mnar filen. P&aring;verkar inte ber&auml;kningen.</p>
-        {/if}
-      </div>
-      <div class="field">
-        {@render rubrik('orgnr', 'Bolagets organisationsnummer')}
-        <input id="k10-orgnr" type="text" inputmode="numeric" autocomplete="off" placeholder="NNNNNN-NNNN" bind:value={orgnr} />
-        {#if hjalp.orgnr}
-          <p id="k10-orgnr-hjalp" class="help">
-            Tio siffror f&ouml;r bolaget vars aktier K10:an g&auml;ller. Finns p&aring; registreringsbeviset
-            och i bolagets årsredovisning.
-          </p>
-        {/if}
-        {#if orgnr && !org}<small class="error">Kontrollera organisationsnumret.</small>{/if}
-      </div>
-      </div>
-    </fieldset>
     <fieldset class="grupp">
       <legend>Den 1 januari {UTDELNINGSAR}</legend>
       <div class="grupp-falt">
@@ -438,6 +414,53 @@
       <div><dt>Sparat utdelningsutrymme till n&auml;sta &aring;r</dt><dd>{formatSEK(k10.sparatTillNastaAr)}</dd></div>
     </dl>
 
+    <div class="till-holding">
+      <p>Skulle ett holdingbolag ge dig mer utdelningsutrymme?</p>
+      <button type="button" class="hamta-btn" onclick={visaHolding} data-umami-event="K10 till holding">
+        Se om ett holdingbolag l&ouml;nar sig med dina siffror
+      </button>
+      <small>Dina v&auml;rden f&ouml;rs &ouml;ver till panelen och kalkylatorn visar j&auml;mf&ouml;relsen i steg 2.</small>
+    </div>
+
+    <h3 class="ladda-ner-rubrik">Ladda ner din K10</h3>
+    <p class="note">Personnummer och organisationsnummer beh&ouml;vs bara i filen.</p>
+    <div class="fields">
+    <fieldset class="grupp">
+      <legend>Du och bolaget</legend>
+      <div class="grupp-falt">
+      <div class="field">
+        {@render rubrik('pnr', 'Ditt personnummer')}
+        <input id="k10-pnr" type="text" inputmode="numeric" autocomplete="off" placeholder="&Aring;&Aring;&Aring;&Aring;MMDD-NNNN" bind:value={personnummer} />
+        {#if hjalp.pnr}
+          <p id="k10-pnr-hjalp" class="help">
+            Tolv siffror, med &aring;rhundradet f&ouml;rst. Personnumret skrivs bara in i filen och
+            skickas ingenstans.
+          </p>
+        {/if}
+        {#if personnummer && !pnr}<small class="error">Ange tolv siffror, t.ex. 19800101-1234.</small>{/if}
+      </div>
+      <div class="field">
+        {@render rubrik('namn', 'Ditt namn', true)}
+        <input id="k10-namn" type="text" autocomplete="off" bind:value={namn} />
+        {#if hjalp.namn}
+          <p id="k10-namn-hjalp" class="help">Visas p&aring; kvittot n&auml;r du l&auml;mnar filen. P&aring;verkar inte ber&auml;kningen.</p>
+        {/if}
+      </div>
+      <div class="field">
+        {@render rubrik('orgnr', 'Bolagets organisationsnummer')}
+        <input id="k10-orgnr" type="text" inputmode="numeric" autocomplete="off" placeholder="NNNNNN-NNNN" bind:value={orgnr} />
+        {#if hjalp.orgnr}
+          <p id="k10-orgnr-hjalp" class="help">
+            Tio siffror f&ouml;r bolaget vars aktier K10:an g&auml;ller. Finns p&aring; registreringsbeviset
+            och i bolagets årsredovisning.
+          </p>
+        {/if}
+        {#if orgnr && !org}<small class="error">Kontrollera organisationsnumret.</small>{/if}
+      </div>
+      </div>
+    </fieldset>
+    </div>
+
     <button type="button" class="download-btn" disabled={!kanLaddaNer} onclick={laddaNer} data-umami-event="Ladda ner K10">
       Ladda ner K10 som SRU-fil
     </button>
@@ -635,6 +658,33 @@
     cursor: pointer;
   }
 
+  .till-holding {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+    background: var(--color-primary-bg);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    font-size: 0.9rem;
+  }
+
+  .till-holding p {
+    font-weight: 600;
+  }
+
+  .till-holding small {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .ladda-ner-rubrik {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
   .hamta {
     display: flex;
     flex-wrap: wrap;
@@ -723,5 +773,93 @@
 
   .add-btn:hover {
     border-color: var(--color-primary);
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .avsnitt th {
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    padding: var(--spacing-md) var(--spacing-sm) var(--spacing-xs);
+  }
+
+  .punkt {
+    width: 3.5em;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .val {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  tr.total td {
+    font-weight: 700;
+  }
+
+  .summary {
+    margin: var(--spacing-lg) 0;
+    max-width: 480px;
+  }
+
+  .summary div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    font-size: 0.9rem;
+    padding: var(--spacing-xs) 0;
+  }
+
+  .summary dd {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .download-btn {
+    background: var(--color-primary);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    cursor: pointer;
+  }
+
+  .download-btn:disabled {
+    background: var(--color-border);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+  }
+
+  .note {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: var(--spacing-sm);
+  }
+
+  .howto {
+    font-size: 0.85rem;
+    margin-top: var(--spacing-lg);
   }
 </style>
