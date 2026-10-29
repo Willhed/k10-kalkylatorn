@@ -11,7 +11,7 @@ import {
 
 // K10 för det enkla fallet: ett svenskt bolag, aktierna ägda hela föregående år
 // och vid årets ingång, ingen försäljning eller gåva under året, ingen make/maka
-// som äger aktier och högst fyra svenska dotterföretag. Fältkoderna är Skatteverkets (SKV 269).
+// som äger aktier och bara svenska dotterföretag. Fältkoderna är Skatteverkets (SKV 269).
 
 // Hela kronor. Avrundas först till öre så att t.ex. 100 000 × 11,55 % inte blir
 // 11 549 kr på grund av flyttalsfel, och sedan nedåt så att gränsbeloppet aldrig
@@ -180,7 +180,8 @@ const tvaSiffror = (n) => String(n).padStart(2, '0');
  * @param {number} p.aktierAgda
  * @param {number} p.aktierTotalt
  * @param {object[]} p.rutor - Från beraknaK10
- * @param {string[]} [p.dotterOrgnr] - Dotterföretagens organisationsnummer i SRU-format, högst fyra
+ * @param {string[]} [p.dotterOrgnr] - Organisationsnummer i SRU-format för dotterföretag där
+ *   delägaren eller närstående tagit ut lön; blanketten har plats för fyra
  * @param {Date} [p.tid] - När filen framställs
  * @param {string} [p.blankettblock]
  * @returns {string}
