@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { AR_VARDEN, UTDELNINGSAR, IBB, IBB_AR, SLR, RANTA_PROCENT } from './constants.js';
+import { AR_VARDEN, UTDELNINGSAR, IBB, IBB_AR, SLR, RANTA_PROCENT, K10_BLANKETTER } from './constants.js';
 
 describe('årsvärden', () => {
   it('har alla värden ifyllda för det aktiva utdelningsåret', () => {
@@ -8,6 +8,15 @@ describe('årsvärden', () => {
     expect(ar, `AR_VARDEN saknar ${UTDELNINGSAR}`).toBeDefined();
     expect(ar.ibb).toBeGreaterThan(0);
     expect(ar.slr, `Statslåneräntan för ${UTDELNINGSAR} är inte ifylld`).toBeTypeOf('number');
+  });
+
+  it('har K10-blankettens värden för det aktiva utdelningsåret', () => {
+    // Fältkoder och blankettblock kommer från Skatteverkets SKV 269 för året
+    const k10 = K10_BLANKETTER[UTDELNINGSAR];
+    expect(k10, `K10_BLANKETTER saknar ${UTDELNINGSAR}`).toBeDefined();
+    expect(k10.blankettblock).toBe(`K10-${UTDELNINGSAR}P4`);
+    // Taket är 90 × IBB för utdelningsåret, som är nästa års IBB-värde i AR_VARDEN
+    expect(k10.takTjanstUtdelning).toBe(90 * AR_VARDEN[UTDELNINGSAR + 1].ibb);
   });
 
   it('härleder IBB, IBB-år och räntesats från det aktiva året', () => {
