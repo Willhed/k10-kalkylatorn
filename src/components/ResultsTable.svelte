@@ -13,7 +13,8 @@
     <h2>Detaljerad ber&auml;kning</h2>
     <span class="summary-hint">Komponent f&ouml;r komponent, direkt &auml;gande mot holdingbolag</span>
   </summary>
-  <!-- Tabellen kan scrolla i sidled på mobil; tabindex gör den nåbar med tangentbord -->
+  <!-- På smala skärmar staplas raderna: komponenten överst, beloppen under med kolumnnamn.
+       tabindex gör tabellen nåbar med tangentbord om den ändå måste scrolla. -->
   <div class="table-wrapper" tabindex="0" role="region" aria-label="Detaljerad beräkning">
     <table>
       <thead>
@@ -35,13 +36,13 @@
               {/if}
             </span>
           </td>
-          <td class="val">
+          <td data-label="Direkt ägande" class="val">
             {formatSEK(direktResult.grundbelopp)}
             {#if direktResult.grundbeloppProportioneras}
               <span class="prop-badge" title="Reducerat fr&aring;n {formatSEK(direktResult.rawGrundbelopp)} p.g.a. proportionering">Prop.</span>
             {/if}
           </td>
-          <td class="val">
+          <td data-label="Holdingbolag" class="val">
             {formatSEK(holdingResult.grundbelopp)}
             {#if holdingResult.grundbeloppProportioneras}
               <span class="prop-badge" title="Reducerat fr&aring;n {formatSEK(holdingResult.rawGrundbelopp)} p.g.a. proportionering">Prop.</span>
@@ -53,11 +54,11 @@
             L&ouml;neunderlag
             <span class="formula">&auml;garandel &times; total l&ouml;nesumma</span>
           </td>
-          <td class="val">{formatSEK(direktResult.loneunderlag)}</td>
+          <td data-label="Direkt ägande" class="val">{formatSEK(direktResult.loneunderlag)}</td>
           {#if holdingResult.loneunderlag > 0}
-            <td class="val">{formatSEK(holdingResult.loneunderlag)}</td>
+            <td data-label="Holdingbolag" class="val">{formatSEK(holdingResult.loneunderlag)}</td>
           {:else}
-            <td class="val na">Ej till&auml;mpligt</td>
+            <td data-label="Holdingbolag" class="val na">Ej till&auml;mpligt</td>
           {/if}
         </tr>
         <tr>
@@ -65,11 +66,11 @@
             L&ouml;neavdrag
             <span class="formula">8 &times; IBB = {formatSEK(8 * IBB)}</span>
           </td>
-          <td class="val negative">&minus;{formatSEK(direktResult.loneavdrag)}</td>
+          <td data-label="Direkt ägande" class="val negative">&minus;{formatSEK(direktResult.loneavdrag)}</td>
           {#if holdingResult.loneunderlag > 0}
-            <td class="val negative">&minus;{formatSEK(holdingResult.loneavdrag)}</td>
+            <td data-label="Holdingbolag" class="val negative">&minus;{formatSEK(holdingResult.loneavdrag)}</td>
           {:else}
-            <td class="val na">&mdash;</td>
+            <td data-label="Holdingbolag" class="val na">&mdash;</td>
           {/if}
         </tr>
         <tr>
@@ -77,8 +78,8 @@
             L&ouml;nebaserat utrymme
             <span class="formula">max(0, underlag &minus; avdrag) &times; 50 %</span>
           </td>
-          <td class="val">{formatSEK(direktResult.lonebaseratUtrymme)}</td>
-          <td class="val">{formatSEK(holdingResult.lonebaseratUtrymme)}</td>
+          <td data-label="Direkt ägande" class="val">{formatSEK(direktResult.lonebaseratUtrymme)}</td>
+          <td data-label="Holdingbolag" class="val">{formatSEK(holdingResult.lonebaseratUtrymme)}</td>
         </tr>
         {#if direktResult.capApplied || holdingResult.capApplied}
           <tr class="cap-row">
@@ -86,7 +87,7 @@
               50&times;-tak
               <span class="formula">50 &times; egen l&ouml;n</span>
             </td>
-            <td class="val" class:cap-hit={direktResult.capApplied}>
+            <td data-label="Direkt ägande" class="val" class:cap-hit={direktResult.capApplied}>
               {#if direktResult.capApplied}
                 {formatSEK(direktResult.lonebaseratCap)}
                 <span class="cap-badge">Tak!</span>
@@ -94,7 +95,7 @@
                 &mdash;
               {/if}
             </td>
-            <td class="val" class:cap-hit={holdingResult.capApplied}>
+            <td data-label="Holdingbolag" class="val" class:cap-hit={holdingResult.capApplied}>
               {#if holdingResult.capApplied}
                 {formatSEK(holdingResult.lonebaseratCap)}
                 <span class="cap-badge">Tak!</span>
@@ -109,23 +110,23 @@
             R&auml;nta p&aring; omkostnadsbelopp
             <span class="formula">(belopp &minus; 100 000) &times; {formatPercentDecimal(RANTA_PROCENT)}</span>
           </td>
-          <td class="val">{formatSEK(direktResult.rantaUtrymme)}</td>
-          <td class="val">{formatSEK(holdingResult.rantaUtrymme)}</td>
+          <td data-label="Direkt ägande" class="val">{formatSEK(direktResult.rantaUtrymme)}</td>
+          <td data-label="Holdingbolag" class="val">{formatSEK(holdingResult.rantaUtrymme)}</td>
         </tr>
         <tr class="total-row">
           <td>Gr&auml;nsbelopp</td>
-          <td class="val" class:winner={direktWins}>{formatSEK(direktResult.gransbelopp)}</td>
-          <td class="val" class:winner={!direktWins && diff > 0}>{formatSEK(holdingResult.gransbelopp)}</td>
+          <td data-label="Direkt ägande" class="val" class:winner={direktWins}>{formatSEK(direktResult.gransbelopp)}</td>
+          <td data-label="Holdingbolag" class="val" class:winner={!direktWins && diff > 0}>{formatSEK(holdingResult.gransbelopp)}</td>
         </tr>
         {#if diff > 0}
           <tr class="savings-row">
             <td>Skillnad</td>
             {#if direktWins}
-              <td class="val positive">+{formatSEK(diff)}</td>
-              <td class="val"></td>
+              <td data-label="Direkt ägande" class="val positive">+{formatSEK(diff)}</td>
+              <td data-label="Holdingbolag" class="val"></td>
             {:else}
-              <td class="val"></td>
-              <td class="val positive">+{formatSEK(diff)}</td>
+              <td data-label="Direkt ägande" class="val"></td>
+              <td data-label="Holdingbolag" class="val positive">+{formatSEK(diff)}</td>
             {/if}
           </tr>
         {/if}
@@ -318,6 +319,84 @@
     font-weight: 600;
     margin-left: 4px;
     cursor: help;
+  }
+
+  /* Smal skärm: varje komponent blir ett block med beloppen sida vid sida under namnet */
+  @media (max-width: 600px) {
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+
+    tr {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: var(--spacing-md);
+      padding: var(--spacing-sm) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    td {
+      display: block;
+      padding: 0;
+      border: none;
+    }
+
+    td:first-child {
+      grid-column: 1 / -1;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .val {
+      text-align: left;
+      white-space: normal;
+    }
+
+    .val::before {
+      content: attr(data-label);
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--color-text-muted);
+      font-style: normal;
+    }
+
+    .val:empty::before {
+      content: none;
+    }
+
+    .cap-row,
+    .savings-row {
+      padding-left: var(--spacing-sm);
+      padding-right: var(--spacing-sm);
+    }
+
+    .cap-row td,
+    .savings-row td {
+      background: none;
+    }
+
+    .cap-row {
+      background: var(--color-accent-light);
+    }
+
+    .savings-row {
+      background: var(--color-success-bg);
+    }
+
+    .total-row {
+      border-top: 2px solid var(--color-text);
+      border-bottom: 2px solid var(--color-text);
+    }
+
+    .total-row td {
+      border: none;
+    }
   }
 
   .prop-notice {
