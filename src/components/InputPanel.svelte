@@ -158,8 +158,8 @@
       </div>
       {#if hjalp.dotter}
         <p id="dotter-hjalp" class="input-help">
-          Kryssa i om holdingbolaget har best&auml;mmande inflytande (&Aring;RL 1:4) via t.ex.
-          r&ouml;stmajoritet, styrelsemajoritet eller avtal &mdash; trots kapitalandel under 50&nbsp;%.
+          Kryssa i om holdingbolaget har best&auml;mmande inflytande (aktiebolagslagen 1 kap. 11 &sect;) via t.ex.
+          r&ouml;stmajoritet, styrelsemajoritet eller avtal &mdash; trots att kapitalandelen trots kapitalandel under 50&nbsp;%.auml;r h&ouml;gst 50&nbsp;%.
           D&aring; r&auml;knas bolagets l&ouml;ner med i holdingbolagets l&ouml;neunderlag.
         </p>
       {/if}
