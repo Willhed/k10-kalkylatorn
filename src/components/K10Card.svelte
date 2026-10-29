@@ -2,7 +2,7 @@
   import { formatSEK, formatPercent } from '../lib/formatters.js';
   import { UTDELNINGSAR, IBB_AR } from '../lib/constants.js';
   import { clamp, parseNumber, roundTo, handleBlur, handleFocus, handleKeydown } from '../lib/numberInput.js';
-  import { beraknaK10, normaliseraPersonnummer, normaliseraOrgnr, skapaBlanketterSru, tillLatin1 } from '../lib/k10.js';
+  import { beraknaK10, raknaDotterforetag, normaliseraPersonnummer, normaliseraOrgnr, skapaBlanketterSru, tillLatin1 } from '../lib/k10.js';
 
   // Steg 3 har egna fält för allt, eftersom K10 kräver de faktiska värdena medan panelen är
   // till för att pröva scenarier. Panelens värden kan hämtas med en knapp. Personuppgifterna
@@ -25,6 +25,12 @@
   let omkostnadsbelopp = $state(0);
   // Övriga fåmansbolag: { namn, andel (procent) }, som i panelen
   let ovrigaBolag = $state([]);
+  // Dotterföretag: { orgnr (som skrivet), loner, andel (procent) }; blanketten har plats för fyra
+  let dotterforetag = $state([]);
+  const MAX_DOTTER = 4;
+  let dotterNr = $derived(dotterforetag.map((d) => normaliseraOrgnr(d.orgnr)));
+  let dotterDubblett = $derived(dotterNr.map((nr, i) => !!nr && dotterNr.indexOf(nr) !== i));
+  let dotterOk = $derived(dotterNr.every(Boolean) && !dotterDubblett.some(Boolean));
   let egenLon = $state(0);
   let utdelning = $state(0);
   let bekraftat = $state(false);
@@ -69,6 +75,10 @@
           sparatUtrymme,
           utdelning,
           ovrigaAgarandelar: ovrigaBolag.map((b) => b.andel / 100),
+          // Rader utan giltigt organisationsnummer räknas inte; nedladdningen spärras tills de rättas
+          dotterforetag: dotterforetag
+            .map((d, i) => ({ orgnr: dotterNr[i], loner: d.loner, andel: d.andel }))
+            .filter((d, i) => d.orgnr && !dotterDubblett[i]),
         })
       : null
   );
@@ -82,10 +92,10 @@
     k10 ? Object.keys(AVSNITT).filter((a) => k10.rutor.some((r) => r.avsnitt === a)) : []
   );
 
-  let kanLaddaNer = $derived(k10 && pnr && org && bekraftat);
+  let kanLaddaNer = $derived(k10 && pnr && org && bekraftat && dotterOk);
 
   function laddaNer() {
-    const sru = skapaBlanketterSru({ personnummer: pnr, namn, orgnr: org, aktierAgda, aktierTotalt, rutor: k10.rutor });
+    const sru = skapaBlanketterSru({ personnummer: pnr, namn, orgnr: org, aktierAgda, aktierTotalt, rutor: k10.rutor, dotterOrgnr: dotterNr });
     const url = URL.createObjectURL(new Blob([tillLatin1(sru)], { type: 'text/plain;charset=iso-8859-1' }));
     const a = document.createElement('a');
     a.href = url;
@@ -108,7 +118,7 @@
   <div class="scope">
     <p>Verktyget t&auml;cker bara det enkla fallet. Det st&auml;mmer f&ouml;r dig om:</p>
     <ul>
-      <li>bolaget &auml;r svenskt och saknar dotterf&ouml;retag,</li>
+      <li>bolaget &auml;r svenskt och har h&ouml;gst fyra dotterf&ouml;retag, alla svenska,</li>
       <li>du &auml;gde aktierna hela {IBB_AR} och vid ing&aring;ngen av {UTDELNINGSAR},</li>
       <li>du inte s&aring;lt eller gett bort aktier under {UTDELNINGSAR},</li>
       <li>ingen make, maka eller sambo &auml;ger aktier i bolaget (sambo r&auml;knas om ni har varit gifta eller har eller har haft barn tillsammans).</li>
@@ -288,7 +298,7 @@
         {/if}
       </div>
       <div class="field">
-        {@render rubrik('lon', 'Din och närståendes lön från bolaget')}
+        {@render rubrik('lon', 'Din och närståendes lön')}
         <input
           id="k10-lon"
           class="input-number"
@@ -309,7 +319,8 @@
             </p>
             <p>
               Ditt l&ouml;nebaserade utrymme f&aring;r vara h&ouml;gst 50 g&aring;nger summan av din och
-              dina <strong>n&auml;rst&aring;endes</strong> kontanta l&ouml;n fr&aring;n bolaget. N&auml;rst&aring;ende &auml;r:
+              dina <strong>n&auml;rst&aring;endes</strong> kontanta l&ouml;n fr&aring;n bolaget och dess
+              dotterf&ouml;retag, s&aring; r&auml;kna med l&ouml;n fr&aring;n dotterf&ouml;retagen h&auml;r. N&auml;rst&aring;ende &auml;r:
             </p>
             <ul>
               <li>make eller maka, och sambo som du har varit gift med eller har eller har haft barn med,</li>
@@ -319,6 +330,98 @@
               <li>d&ouml;dsbon d&auml;r du eller n&aring;gon av dessa &auml;r del&auml;gare.</li>
             </ul>
           </div>
+        {/if}
+      </div>
+      <div class="field ovriga">
+        <div class="field-label">
+          <span class="label-text">Dotterf&ouml;retag</span>
+          <button
+            type="button"
+            class="help-btn"
+            aria-expanded={!!hjalp.dotter}
+            aria-controls="k10-dotter-hjalp"
+            aria-label="Förklaring: dotterföretag"
+            onclick={() => (hjalp.dotter = !hjalp.dotter)}
+          >?</button>
+        </div>
+        {#if hjalp.dotter}
+          <div id="k10-dotter-hjalp" class="help">
+            <p>
+              Ett bolag &auml;r dotterf&ouml;retag om ditt bolag har mer &auml;n h&auml;lften av r&ouml;sterna
+              i det, eller p&aring; annat s&auml;tt best&auml;mmande inflytande, t.ex. r&auml;tt att utse mer
+              &auml;n halva styrelsen. &Auml;ven bolag som &auml;gs via ett annat dotterf&ouml;retag r&auml;knas.
+            </p>
+            <p>
+              Ange de kontanta l&ouml;nerna i dotterf&ouml;retaget under den tid ditt bolag &auml;gde det
+              {IBB_AR}, och ditt bolags andel. Kalkylatorn r&auml;knar med l&ouml;nerna g&aring;nger
+              andelen. Ett handelsbolag eller kommanditbolag r&auml;knas bara om det &auml;gs till
+              100&nbsp;%; organisationsnummer som b&ouml;rjar p&aring; 9 behandlas som s&aring;dana.
+            </p>
+          </div>
+        {/if}
+        {#each dotterforetag as d, i}
+          {@const dr = dotterNr[i] ? raknaDotterforetag({ orgnr: dotterNr[i], loner: d.loner, andel: d.andel }) : null}
+          <div class="dotter-row">
+            <label class="dotter-cell dotter-orgnr-cell">
+              <span>Organisationsnummer</span>
+              <input
+                class="dotter-orgnr"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="NNNNNN-NNNN"
+                bind:value={dotterforetag[i].orgnr}
+                onkeydown={handleKeydown}
+              />
+            </label>
+            <label class="dotter-cell">
+              <span>Kontanta l&ouml;ner {IBB_AR}</span>
+              <input
+                class="input-number"
+                type="text"
+                inputmode="numeric"
+                value={formatSEK(d.loner)}
+                onfocus={handleFocus}
+                onblur={(e) => handleBlur(e, 0, Infinity, (v) => (dotterforetag[i].loner = v), formatSEK)}
+                onkeydown={handleKeydown}
+              />
+            </label>
+            <label class="dotter-cell">
+              <span>Ditt bolags andel</span>
+              <input
+                class="input-number"
+                type="text"
+                inputmode="numeric"
+                value={formatPercent(d.andel)}
+                onfocus={handleFocus}
+                onblur={(e) => {
+                  const val = parseNumber(e.target.value);
+                  if (!isNaN(val)) {
+                    dotterforetag[i].andel = clamp(roundTo(val, 2), 0.01, 100);
+                    e.target.value = formatPercent(dotterforetag[i].andel);
+                  }
+                }}
+                onkeydown={handleKeydown}
+              />
+            </label>
+            <button type="button" class="remove-btn" onclick={() => dotterforetag.splice(i, 1)} aria-label="Ta bort dotterföretag {i + 1}">&times;</button>
+          </div>
+          {#if d.orgnr && !dotterNr[i]}
+            <small class="error">Kontrollera organisationsnumret.</small>
+          {:else if !d.orgnr}
+            <small>Organisationsnummer kr&auml;vs; det skrivs in p&aring; blanketten.</small>
+          {:else if dotterDubblett[i]}
+            <small class="error">Samma dotterf&ouml;retag finns redan ovan.</small>
+          {:else if dr?.handelsbolag && d.andel < 100}
+            <small class="error">Handelsbolag r&auml;knas bara om ditt bolag &auml;ger 100&nbsp;%. L&ouml;nerna tas inte med.</small>
+          {:else if dr}
+            <small>R&auml;knas med {formatSEK(dr.raknas)}.</small>
+          {/if}
+        {/each}
+        {#if dotterforetag.length < MAX_DOTTER}
+          <button type="button" class="add-btn" onclick={() => dotterforetag.push({ orgnr: '', loner: 0, andel: 100 })}>+ L&auml;gg till dotterf&ouml;retag</button>
+        {:else}
+          <small>Blanketten har plats f&ouml;r fyra dotterf&ouml;retag.</small>
         {/if}
       </div>
       </div>
@@ -728,6 +831,52 @@
     align-items: center;
     gap: var(--spacing-sm);
     max-width: 32rem;
+  }
+
+  /* Organisationsnummer, löner, andel och ta bort på en rad; på smal skärm hamnar
+     organisationsnumret på egen rad överst */
+  .dotter-row {
+    display: grid;
+    grid-template-columns: 11rem 1fr 6.5rem auto;
+    align-items: end;
+    gap: var(--spacing-sm);
+    max-width: 40rem;
+  }
+
+  .dotter-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .dotter-cell span {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--color-text-muted);
+  }
+
+  .dotter-orgnr {
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding: 4px 8px;
+    border: 1.5px solid var(--color-border);
+    border-radius: 6px;
+    color: var(--color-text);
+  }
+
+  .dotter-row .remove-btn {
+    margin-bottom: 4px;
+  }
+
+  @media (max-width: 480px) {
+    .dotter-row {
+      grid-template-columns: 1fr 6.5rem auto;
+    }
+
+    .dotter-orgnr-cell {
+      grid-column: 1 / -1;
+    }
   }
 
   .ovriga-namn {

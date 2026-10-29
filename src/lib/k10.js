@@ -11,7 +11,7 @@ import {
 
 // K10 för det enkla fallet: ett svenskt bolag, aktierna ägda hela föregående år
 // och vid årets ingång, ingen försäljning eller gåva under året, ingen make/maka
-// som äger aktier och inga dotterföretag. Fältkoderna är Skatteverkets (SKV 269).
+// som äger aktier och högst fyra svenska dotterföretag. Fältkoderna är Skatteverkets (SKV 269).
 
 // Hela kronor. Avrundas först till öre så att t.ex. 100 000 × 11,55 % inte blir
 // 11 549 kr på grund av flyttalsfel, och sedan nedåt så att gränsbeloppet aldrig
@@ -25,6 +25,8 @@ const kronor = (x) => Math.floor(Math.round(x * 100) / 100);
  * @param {number} u.aktierAgda - Antal aktier du ägde vid årets ingång
  * @param {number} u.aktierTotalt - Totala antalet aktier i företaget vid årets ingång
  * @param {number} u.lonesumma - Kontant ersättning till arbetstagare i företaget föregående år
+ * @param {object[]} [u.dotterforetag] - { orgnr, loner, andel }: dotterföretagets kontanta
+ *   ersättning under den tid det ägdes föregående år och moderföretagets andel i procent
  * @param {number} u.egenLon - Din (och närståendes) kontanta ersättning från företaget föregående år
  * @param {number} u.omkostnadsbelopp - Omkostnadsbelopp för dina aktier
  * @param {number} u.sparatUtrymme - Sparat utdelningsutrymme från föregående års K10
@@ -44,7 +46,10 @@ export function beraknaK10(u, v = {}) {
   const grundbelopp = kronor(summaAndelar > 1 ? (andel / summaAndelar) * grundFull : andel * grundFull);
 
   // D. Lönebaserat utrymme, för aktier ägda hela föregående år
-  const loneunderlag = kronor(u.lonesumma * andel);
+  const dotter = (u.dotterforetag ?? []).map(raknaDotterforetag);
+  const lonerDotter = dotter.reduce((s, d) => s + d.raknas, 0);
+  const lonesummaTotal = u.lonesumma + lonerDotter;
+  const loneunderlag = kronor(lonesummaTotal * andel);
   const loneavdrag = LONEAVDRAG_FACTOR * ibb;
   const efterAvdrag = loneunderlag - loneavdrag;
   const lonebaseratSammanlagt = efterAvdrag > 0 ? kronor(efterAvdrag * LONEBASERAT_PERCENTAGE) : 0;
@@ -91,7 +96,10 @@ export function beraknaK10(u, v = {}) {
   if (lonebaseratSammanlagt > 0) {
     rutor.push(
       { avsnitt: 'D', punkt: '4.1', kod: 4570, text: 'Kontant ersättning till arbetstagare i företaget', belopp: u.lonesumma },
-      { avsnitt: 'D', punkt: '4.3', kod: 4572, text: 'Löneunderlag för aktier ägda hela året', belopp: u.lonesumma },
+      ...(lonerDotter > 0
+        ? [{ avsnitt: 'D', punkt: '4.2', kod: 4571, text: 'Kontant ersättning till arbetstagare i dotterföretag', belopp: lonerDotter }]
+        : []),
+      { avsnitt: 'D', punkt: '4.3', kod: 4572, text: 'Löneunderlag för aktier ägda hela året', belopp: lonesummaTotal },
       { avsnitt: 'D', punkt: '4.4', kod: 4576, text: 'Din andel av löneunderlaget', belopp: loneunderlag },
       { avsnitt: 'D', punkt: '4.9', kod: 4584, text: 'Totalt löneunderlag', belopp: loneunderlag },
       { avsnitt: 'D', punkt: '4.10', kod: 4585, text: 'Löneavdrag (8 inkomstbasbelopp)', belopp: loneavdrag },
@@ -103,6 +111,7 @@ export function beraknaK10(u, v = {}) {
   return {
     andel,
     rutor,
+    dotterforetag: dotter,
     gransbelopp,
     lonebaseratBegransat: lonebaserat < lonebaseratSammanlagt,
     sparatTillNastaAr,
@@ -110,6 +119,18 @@ export function beraknaK10(u, v = {}) {
     tjanst,
     kapital,
   };
+}
+
+/**
+ * Hur mycket av ett dotterföretags löner som räknas in i löneunderlaget.
+ * Löner i ett dotterföretag som inte är helägt räknas med moderföretagets andel
+ * (57 kap. 17 § IL). Ett handelsbolag räknas bara om det är helägt (57 kap. 19 a § IL);
+ * organisationsnummer som börjar på 9 behandlas som handelsbolag.
+ */
+export function raknaDotterforetag({ orgnr, loner, andel }) {
+  const handelsbolag = orgnr.slice(-10).startsWith('9');
+  const raknas = handelsbolag ? (andel >= 100 ? loner : 0) : kronor((loner * andel) / 100);
+  return { orgnr, loner, andel, handelsbolag, raknas };
 }
 
 // Luhn-kontrollsiffra över tio siffror
@@ -159,11 +180,12 @@ const tvaSiffror = (n) => String(n).padStart(2, '0');
  * @param {number} p.aktierAgda
  * @param {number} p.aktierTotalt
  * @param {object[]} p.rutor - Från beraknaK10
+ * @param {string[]} [p.dotterOrgnr] - Dotterföretagens organisationsnummer i SRU-format, högst fyra
  * @param {Date} [p.tid] - När filen framställs
  * @param {string} [p.blankettblock]
  * @returns {string}
  */
-export function skapaBlanketterSru({ personnummer, namn, orgnr, aktierAgda, aktierTotalt, rutor, tid = new Date(), blankettblock = K10_BLANKETT.blankettblock }) {
+export function skapaBlanketterSru({ personnummer, namn, orgnr, aktierAgda, aktierTotalt, rutor, dotterOrgnr = [], tid = new Date(), blankettblock = K10_BLANKETT.blankettblock }) {
   const datum = `${tid.getFullYear()}${tvaSiffror(tid.getMonth() + 1)}${tvaSiffror(tid.getDate())}`;
   const klocka = `${tvaSiffror(tid.getHours())}${tvaSiffror(tid.getMinutes())}${tvaSiffror(tid.getSeconds())}`;
   // # och radbrytningar är inte tillåtna i värden
@@ -178,6 +200,8 @@ export function skapaBlanketterSru({ personnummer, namn, orgnr, aktierAgda, akti
     `#UPPGIFT 4532 ${aktierTotalt}`,
     // Tomma uppgifter utelämnas; beloppen anges utan tecken enligt blankettens förtryck
     ...rutor.filter((r) => r.belopp > 0).map((r) => `#UPPGIFT ${r.kod} ${r.belopp}`),
+    // Blanketten har fyra rutor för dotterföretagens organisationsnummer
+    ...dotterOrgnr.slice(0, 4).map((nr, i) => `#UPPGIFT ${4564 + i} ${nr}`),
     '#BLANKETTSLUT',
     '#FIL_SLUT',
   ];
