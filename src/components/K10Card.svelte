@@ -4,15 +4,19 @@
   import { handleBlur, handleFocus, handleKeydown } from '../lib/numberInput.js';
   import { beraknaK10, normaliseraPersonnummer, normaliseraOrgnr, skapaBlanketterSru, tillLatin1 } from '../lib/k10.js';
 
-  // Lönesumma, omkostnadsbelopp, sparat utrymme och övriga bolag hämtas från panelen.
-  // Personuppgifterna här sparas inte i den delbara länken och lämnar aldrig webbläsaren.
-  let { totalLonesumma, omkostnadsbelopp, sparatUtrymme, ovrigaAgarandelar } = $props();
+  // Omkostnadsbelopp och övriga bolag hämtas från panelen. Ägarandel, lönesumma och sparat
+  // utrymme har egna fält, eftersom K10 kräver de faktiska värdena per 1 januari, föregående år
+  // respektive förra årets K10, medan panelen är till för att pröva scenarier. Personuppgifterna här sparas inte i den
+  // delbara länken och lämnar aldrig webbläsaren.
+  let { agarandel = $bindable(), omkostnadsbelopp, ovrigaAgarandelar } = $props();
 
   let personnummer = $state('');
   let namn = $state('');
   let orgnr = $state('');
   let aktierAgda = $state(0);
   let aktierTotalt = $state(0);
+  let lonesumma = $state(0);
+  let sparatUtrymme = $state(0);
   let egenLon = $state(0);
   let utdelning = $state(0);
   let bekraftat = $state(false);
@@ -30,7 +34,7 @@
       ? beraknaK10({
           aktierAgda,
           aktierTotalt,
-          lonesumma: totalLonesumma,
+          lonesumma,
           egenLon,
           omkostnadsbelopp,
           sparatUtrymme,
@@ -39,6 +43,10 @@
         })
       : null
   );
+
+  // Ägarandel i procent med två decimaler, som panelen
+  let andelProcent = $derived(k10 ? Math.round(k10.andel * 10_000) / 100 : null);
+  let andelSkiljer = $derived(andelProcent !== null && Math.abs(agarandel - andelProcent) >= 0.01);
 
   const AVSNITT = { A: 'A. Gränsbelopp', B: 'B. Utdelning', D: 'D. Lönebaserat utrymme' };
   let avsnitt = $derived(
@@ -61,9 +69,9 @@
 <section class="step-three" id="k10">
   <h2><span class="step">Steg 3</span> Skapa din K10 f&ouml;r inkomst&aring;r {UTDELNINGSAR}</h2>
   <p class="step-intro">
-    Fyll i det som saknas, s&aring; f&aring;r du K10:ans rutor och en fil att importera i
-    Skatteverkets e-tj&auml;nst. G&auml;ller direkt &auml;gande; l&ouml;nesumma,
-    omkostnadsbelopp och sparat utrymme h&auml;mtas fr&aring;n panelen.
+    Fyll i det som g&auml;llde 1 januari {UTDELNINGSAR} och under {IBB_AR}, s&aring; f&aring;r du
+    K10:ans rutor och en fil att importera i Skatteverkets e-tj&auml;nst. G&auml;ller direkt
+    &auml;gande.
   </p>
 </section>
 
@@ -168,6 +176,26 @@
       {#if aktierAgda > 0 && aktierTotalt > 0 && !aktierOk}<small class="error">Du kan inte &auml;ga fler aktier &auml;n bolaget har.</small>{/if}
     </div>
     <div class="field">
+      {@render rubrik('lonesumma', `Bolagets kontanta löner ${IBB_AR}`)}
+      <input
+        id="k10-lonesumma"
+        class="input-number"
+        type="text"
+        inputmode="numeric"
+        value={formatSEK(lonesumma)}
+        onfocus={handleFocus}
+        onblur={(e) => handleBlur(e, 0, Infinity, (v) => (lonesumma = v), formatSEK)}
+        onkeydown={handleKeydown}
+      />
+      {#if hjalp.lonesumma}
+        <p id="k10-lonesumma-hjalp" class="help">
+          Alla anst&auml;lldas utbetalda bruttol&ouml;ner under {IBB_AR}, inklusive din egen. F&ouml;rm&aring;ner,
+          kostnadsers&auml;ttningar och l&ouml;n som t&auml;cks av statliga l&ouml;nebidrag r&auml;knas inte.
+          Det h&auml;r &auml;r det faktiska beloppet, inte det du provar med i panelen.
+        </p>
+      {/if}
+    </div>
+    <div class="field">
       {@render rubrik('lon', `Din och närståendes kontanta lön från bolaget ${IBB_AR}`)}
       <input
         id="k10-lon"
@@ -222,10 +250,49 @@
         </p>
       {/if}
     </div>
+    <div class="field">
+      {@render rubrik('sparat', 'Sparat utdelningsutrymme från förra årets K10')}
+      <input
+        id="k10-sparat"
+        class="input-number"
+        type="text"
+        inputmode="numeric"
+        value={formatSEK(sparatUtrymme)}
+        onfocus={handleFocus}
+        onblur={(e) => handleBlur(e, 0, Infinity, (v) => (sparatUtrymme = v), formatSEK)}
+        onkeydown={handleKeydown}
+      />
+      {#if hjalp.sparat}
+        <p id="k10-sparat-hjalp" class="help">
+          St&aring;r p&aring; din K10 f&ouml;r {IBB_AR} som <em>Sparat utdelningsutrymme till n&auml;sta &aring;r</em>:
+          p. 1.11 om du anv&auml;nde f&ouml;renklingsregeln, p. 2.12 om du anv&auml;nde huvudregeln.
+          Fick du ingen utdelning {IBB_AR} sparas hela gr&auml;nsbeloppet, p. 1.5 respektive p. 2.6.
+          Har du inget sparat utrymme, l&aring;t den vara 0 kr.
+        </p>
+      {/if}
+    </div>
+  </div>
+
+  <div class="fran-panelen">
+    <p>Fr&aring;n panelen &ndash; &auml;ndra d&auml;r om det inte st&auml;mmer per 1 januari {UTDELNINGSAR}:</p>
+    <dl>
+      <div><dt>Omkostnadsbelopp</dt><dd>{formatSEK(omkostnadsbelopp)}</dd></div>
+      <div><dt>&Ouml;vriga f&aring;mansbolag</dt><dd>{ovrigaAgarandelar.length || 'inga'}</dd></div>
+    </dl>
   </div>
 
   {#if k10}
-    <p class="andel">Din &auml;garandel: {formatPercent(Math.round(k10.andel * 10_000) / 100)}</p>
+    <p class="andel">Din &auml;garandel enligt antalet aktier: {formatPercent(andelProcent)}</p>
+    {#if andelSkiljer}
+      <p class="andel-skiljer">
+        Panelen r&auml;knar med {formatPercent(agarandel)}.
+        {#if andelProcent >= 1}
+          <button type="button" class="link-btn" onclick={() => (agarandel = andelProcent)}>
+            Anv&auml;nd {formatPercent(andelProcent)} i panelen
+          </button>
+        {/if}
+      </p>
+    {/if}
 
     <div class="table-wrapper">
       <table>
@@ -413,6 +480,45 @@
     font-size: 0.85rem;
     color: var(--color-text-muted);
     margin-bottom: var(--spacing-sm);
+  }
+
+  .andel-skiljer {
+    font-size: 0.85rem;
+    margin: calc(-1 * var(--spacing-xs)) 0 var(--spacing-sm);
+  }
+
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .fran-panelen {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .fran-panelen dl {
+    max-width: 420px;
+    margin-top: var(--spacing-xs);
+  }
+
+  .fran-panelen dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+  }
+
+  .fran-panelen dd {
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   .table-wrapper {
