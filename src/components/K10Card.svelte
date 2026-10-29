@@ -74,7 +74,7 @@
       <li>bolaget &auml;r svenskt och saknar dotterf&ouml;retag,</li>
       <li>du &auml;gde aktierna hela {IBB_AR} och vid ing&aring;ngen av {UTDELNINGSAR},</li>
       <li>du inte s&aring;lt eller gett bort aktier under {UTDELNINGSAR},</li>
-      <li>ingen make eller maka &auml;ger aktier i bolaget.</li>
+      <li>ingen make, maka eller sambo &auml;ger aktier i bolaget (sambo r&auml;knas om ni har varit gifta eller har eller har haft barn tillsammans).</li>
     </ul>
     <label class="checkbox-row">
       <input type="checkbox" bind:checked={bekraftat} />
@@ -161,7 +161,8 @@
       {#if hjalp.totalt}
         <p id="k10-totalt-hjalp" class="help">
           Alla aktier i bolaget vid &aring;rets b&ouml;rjan, oavsett vem som &auml;ger dem. Finns i
-          aktieboken och i bolagsordningen eller hos Bolagsverket.
+          aktieboken och p&aring; bolagets registreringsbevis fr&aring;n Bolagsverket; kontrollera att
+          antalet inte har &auml;ndrats sedan 1 januari.
         </p>
       {/if}
       {#if aktierAgda > 0 && aktierTotalt > 0 && !aktierOk}<small class="error">Du kan inte &auml;ga fler aktier &auml;n bolaget har.</small>{/if}
@@ -183,18 +184,18 @@
           <p>
             <strong>Kontant l&ouml;n</strong> &auml;r utbetald bruttol&ouml;n under {IBB_AR}, allts&aring;
             f&ouml;re skatt, inklusive bonus och semesterers&auml;ttning. F&ouml;rm&aring;ner som bil
-            eller friskv&aring;rd r&auml;knas inte, och inte heller pension, arbetsgivaravgifter
-            eller utdelning.
+            eller friskv&aring;rd r&auml;knas inte, och inte heller kostnadsers&auml;ttningar,
+            pensionsavs&auml;ttningar, arbetsgivaravgifter eller utdelning.
           </p>
           <p>
             Ditt l&ouml;nebaserade utrymme f&aring;r vara h&ouml;gst 50 g&aring;nger summan av din och
             dina <strong>n&auml;rst&aring;endes</strong> kontanta l&ouml;n fr&aring;n bolaget. N&auml;rst&aring;ende &auml;r:
           </p>
           <ul>
-            <li>make eller maka, och sambo om ni har eller har haft gemensamma barn eller har varit gifta,</li>
-            <li>f&ouml;r&auml;ldrar, far- och morf&ouml;r&auml;ldrar,</li>
-            <li>barn och barnbarn (&auml;ven styv- och fosterbarn) och deras makar,</li>
-            <li>syskon, syskons makar och syskons barn,</li>
+            <li>make eller maka, och sambo som du har varit gift med eller har eller har haft barn med,</li>
+            <li>f&ouml;r&auml;ldrar, mor- och farf&ouml;r&auml;ldrar,</li>
+            <li>barn, barnbarn och deras barn i alla led, och deras makar (styv- och fosterbarn r&auml;knas som barn),</li>
+            <li>syskon, syskons makar och syskons barn och barnbarn i alla led,</li>
             <li>d&ouml;dsbon d&auml;r du eller n&aring;gon av dessa &auml;r del&auml;gare.</li>
           </ul>
         </div>
@@ -214,8 +215,9 @@
       />
       {#if hjalp.utdelning}
         <p id="k10-utdelning-hjalp" class="help">
-          Utdelning f&ouml;re skatt som betalades ut till dig under {UTDELNINGSAR}, oftast den som
-          beslutades p&aring; &aring;rsst&auml;mman. Har du inte f&aring;tt n&aring;gon, l&aring;t den vara 0 kr;
+          Utdelning f&ouml;re skatt som du kunde f&ouml;rfoga &ouml;ver under {UTDELNINGSAR}, det vill
+          s&auml;ga som betalades ut eller fanns tillg&auml;nglig f&ouml;r dig. Oftast den som beslutades
+          p&aring; &aring;rsst&auml;mman. Har du inte f&aring;tt n&aring;gon, l&aring;t den vara 0 kr;
           d&aring; sparas hela gr&auml;nsbeloppet till n&auml;sta &aring;r.
         </p>
       {/if}
