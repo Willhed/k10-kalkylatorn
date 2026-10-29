@@ -8,7 +8,7 @@
   // utrymme har egna fält, eftersom K10 kräver de faktiska värdena per 1 januari, föregående år
   // respektive förra årets K10, medan panelen är till för att pröva scenarier. Personuppgifterna här sparas inte i den
   // delbara länken och lämnar aldrig webbläsaren.
-  let { agarandel = $bindable(), omkostnadsbelopp, ovrigaAgarandelar } = $props();
+  let { agarandel = $bindable(), totalLonesumma, sparatUtrymme: panelSparat, omkostnadsbelopp, ovrigaAgarandelar } = $props();
 
   let personnummer = $state('');
   let namn = $state('');
@@ -22,6 +22,15 @@
   let bekraftat = $state(false);
   // Vilka fälts förklaringar som är öppna
   let hjalp = $state({});
+
+  // För över panelens värden när användaren har fyllt i sina faktiska siffror där.
+  // Ägarandelen kan inte föras över: K10 kräver antalet aktier.
+  let hamtat = $state(false);
+  function hamtaFranPanelen() {
+    lonesumma = totalLonesumma;
+    sparatUtrymme = panelSparat;
+    hamtat = true;
+  }
 
   const formatAntal = (n) => (n > 0 ? new Intl.NumberFormat('sv-SE').format(n) : '');
 
@@ -104,6 +113,18 @@
       >?</button>
     </div>
   {/snippet}
+
+  <div class="hamta">
+    <p>
+      Har du redan fyllt i panelen med dina faktiska v&auml;rden f&ouml;r {IBB_AR}?
+      {#if hamtat}
+        <strong>H&auml;mtat.</strong> Kontrollera f&auml;lten nedan.
+      {/if}
+    </p>
+    <button type="button" class="hamta-btn" onclick={hamtaFranPanelen}>
+      H&auml;mta l&ouml;nesumma ({formatSEK(totalLonesumma)}) och sparat utrymme ({formatSEK(panelSparat)}) fr&aring;n panelen
+    </button>
+  </div>
 
   <div class="fields">
     <div class="field">
@@ -496,6 +517,32 @@
     color: var(--color-primary);
     text-decoration: underline;
     cursor: pointer;
+  }
+
+  .hamta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.85rem;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .hamta-btn {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    color: var(--color-primary);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    text-align: left;
+  }
+
+  .hamta-btn:hover {
+    border-color: var(--color-primary);
   }
 
   .fran-panelen {
