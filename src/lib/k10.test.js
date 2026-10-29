@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { beraknaK10, normaliseraPersonnummer, normaliseraOrgnr, skapaBlanketterSru, tillLatin1 } from './k10.js';
+import { beraknaK10, raknaDotterforetag, normaliseraPersonnummer, normaliseraOrgnr, skapaBlanketterSru, tillLatin1 } from './k10.js';
 import { beraknaGransbelopp } from './calculations.js';
 
 // Årsvärden anges explicit så att förväntade värden inte ändras när konstanterna
@@ -66,6 +66,42 @@ describe('beraknaK10 – avsnitt A och D', () => {
       const kalk = beraknaGransbelopp(f.aktierAgda / f.aktierTotalt, f.lonesumma, f.egenLon, f.omkostnadsbelopp, AR.ibb, f.ovrigaAgarandelar);
       expect(Math.abs(k10.gransbelopp - kalk.gransbelopp)).toBeLessThan(3);
     }
+  });
+});
+
+describe('beraknaK10 – dotterföretag', () => {
+  // 556000-0100 är ett aktiebolag; nummer som börjar på 9 behandlas som handelsbolag
+  const AB = '165560000100';
+  const HB = '169696000000';
+
+  it('räknar ett aktiebolags löner med moderföretagets andel (57 kap. 17 § IL)', () => {
+    expect(raknaDotterforetag({ orgnr: AB, loner: 1_000_000, andel: 60 }).raknas).toBe(600_000);
+  });
+
+  it('räknar ett handelsbolag bara om det är helägt (57 kap. 19 a § IL)', () => {
+    expect(raknaDotterforetag({ orgnr: HB, loner: 1_000_000, andel: 100 })).toMatchObject({ handelsbolag: true, raknas: 1_000_000 });
+    expect(raknaDotterforetag({ orgnr: HB, loner: 1_000_000, andel: 99 }).raknas).toBe(0);
+  });
+
+  it('lägger dotterföretagens löner i p. 4.2 och i löneunderlaget', () => {
+    const k10 = beraknaK10({
+      ...BAS,
+      lonesumma: 1_000_000,
+      egenLon: 1e9,
+      dotterforetag: [{ orgnr: AB, loner: 1_000_000, andel: 60 }, { orgnr: HB, loner: 500_000, andel: 50 }],
+    }, AR);
+    expect(ruta(k10, '4.2')).toBe(600_000);
+    expect(ruta(k10, '4.3')).toBe(1_600_000);
+    // (1 600 000 − 644 800) × 50 %
+    expect(ruta(k10, '1.2')).toBe(477_600);
+  });
+
+  it('skriver dotterföretagens organisationsnummer i rutorna 4564–4567', () => {
+    const sru = skapaBlanketterSru({
+      personnummer: '191212121212', orgnr: AB, aktierAgda: 1, aktierTotalt: 1, rutor: [],
+      dotterOrgnr: [AB, HB], tid: new Date(2027, 0, 15), blankettblock: 'K10-2026P4',
+    });
+    expect(sru).toContain(`#UPPGIFT 4564 ${AB}\n#UPPGIFT 4565 ${HB}\n#BLANKETTSLUT`);
   });
 });
 

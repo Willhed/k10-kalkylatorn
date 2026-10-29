@@ -132,7 +132,7 @@
       <p class="k10-cta">
         <a href="#k10">Steg 3 i kalkylatorn</a> fyller i K10:an &aring;t dig i det enkla fallet
         och skapar en fil som du importerar i Skatteverkets e-tj&auml;nst. S&auml;ljer du aktier,
-        &auml;ger tillsammans med make, maka eller sambo eller har dotterbolag beh&ouml;ver du fylla i
+        &auml;ger tillsammans med make, maka eller sambo eller har utl&auml;ndska dotterf&ouml;retag beh&ouml;ver du fylla i
         fler delar av blanketten.
       </p>
     </div>
