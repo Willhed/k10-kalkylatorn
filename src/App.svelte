@@ -131,7 +131,7 @@
     <div class="right-col" bind:this={resultatKolumn}>
       <UtrymmeCard {direktResult} {sparatUtrymme} {egenLon} {utrymme} />
 
-      <section class="step-two">
+      <section class="step-two" id="steg-2">
         <h2><span class="step">Steg 2</span> Skulle ett holdingbolag l&ouml;na sig?</h2>
         <p class="step-intro">
           J&auml;mf&ouml;relsen g&auml;ller utrymmet du f&aring;r varje &aring;r fram&ouml;ver,
@@ -161,10 +161,10 @@
        man prövar i panelen, så panelen ska inte följa med ner hit -->
   <K10Card
     bind:agarandel
-    {totalLonesumma}
-    {sparatUtrymme}
-    omkostnadsbelopp={omkostnadsbeloppDirekt}
-    {ovrigaBolag}
+    bind:totalLonesumma
+    bind:sparatUtrymme
+    bind:omkostnadsbelopp={omkostnadsbeloppDirekt}
+    bind:ovrigaBolag
   />
 
   <ExplainerSection />
