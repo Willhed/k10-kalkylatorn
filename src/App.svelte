@@ -136,12 +136,32 @@
         <p class="step-intro">
           J&auml;mf&ouml;relsen g&auml;ller utrymmet du f&aring;r varje &aring;r fram&ouml;ver,
           med dina v&auml;rden under <em>Holdingbolag</em> i panelen.
-          {#if sparatUtrymme > 0}
-            Ditt sparade utdelningsutrymme p&aring; {formatSEK(sparatUtrymme)} ing&aring;r inte:
-            det f&ouml;ljer med aktierna och kan anv&auml;ndas n&auml;r du s&auml;ljer in dem i
-            holdingbolaget, s&aring; att den delen av k&ouml;peskillingen beskattas med 20&nbsp;%.
-          {/if}
         </p>
+        {#if sparatUtrymme > 0}
+          <!-- 57 kap. 15 och 21 §§ samt 48 a kap. 2-10 §§ IL -->
+          <div class="sparat-info">
+            <p>
+              Ditt sparade utdelningsutrymme p&aring; {formatSEK(sparatUtrymme)} ing&aring;r inte i
+              j&auml;mf&ouml;relsen. Det h&ouml;r till dina nuvarande aktier, och vad som h&auml;nder med det
+              beror p&aring; hur aktierna flyttas till holdingbolaget:
+            </p>
+            <ul>
+              <li>
+                <strong>S&auml;ljer du aktierna</strong> till holdingbolaget beskattas vinsten samma
+                &aring;r. Den del som ryms i ditt gr&auml;nsbelopp, inklusive det sparade utrymmet,
+                beskattas med 20&nbsp;%, och sparat utrymme som inte anv&auml;nds f&ouml;rsvinner.
+              </li>
+              <li>
+                <strong>Byter du aktierna</strong> mot aktier i holdingbolaget (andelsbyte) blir det
+                ingen skatt nu, och det sparade utrymmet f&ouml;ljer med till holdingaktierna.
+              </li>
+            </ul>
+            <p>
+              Vilket som passar dig beror p&aring; mer &auml;n utrymmet. Prata g&auml;rna med en
+              r&aring;dgivare innan du best&auml;mmer dig.
+            </p>
+          </div>
+        {/if}
       </section>
 
       <SavingsCard {direktResult} {holdingResult} />
@@ -223,6 +243,21 @@
   .step-intro {
     font-size: 0.9rem;
     color: var(--color-text-muted);
+  }
+
+  .sparat-info {
+    margin-top: var(--spacing-sm);
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  .sparat-info ul {
+    margin: var(--spacing-xs) 0;
+    padding-left: var(--spacing-lg);
+  }
+
+  .sparat-info li + li {
+    margin-top: var(--spacing-xs);
   }
 
   @media (max-width: 900px) {
